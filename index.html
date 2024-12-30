@@ -14,7 +14,12 @@
         </header>
         <main>
             <div class="input-group">
-                <input type="text" id="molecule-name" placeholder="Enter molecule name">
+                <select id="molecule-dropdown">
+                    <option value="" disabled selected>Select a molecule</option>
+                    <option value="methane">Methane</option>
+                    <option value="ethanol">Ethanol</option>
+                    <option value="glucose">Glucose</option>
+                </select>
                 <button id="load-molecule">Load Molecule</button>
             </div>
             <div id="viewer" class="viewer-container"></div>
