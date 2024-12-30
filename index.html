@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Molecule Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+    <script src="https://3Dmol.org/build/3Dmol.ui-min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>3D Molecule Viewer</h1>
+        <div class="controls">
+            <select id="moleculeSelect">
+                <option value="">Select a molecule</option>
+                <option value="methane">Methane</option>
+                <option value="ethanol">Ethanol</option>
+                <option value="glucose">Glucose</option>
+            </select>
+            <button id="loadMolecule">Load Molecule</button>
+        </div>
+        <div id="viewer_container"></div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
+
