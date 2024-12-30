@@ -4,44 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Molecule Viewer</title>
-    <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-
-        h1 {
-            margin-bottom: 10px;
-        }
-
-        #viewer-container {
-            width: 80%;
-            height: 500px;
-            border: 1px solid #ccc;
-            background-color: gray;
-        }
-
-        #controls {
-            margin: 10px 0;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
 </head>
 <body>
-    <h1>Molecule Viewer</h1>
-    <div id="controls">
-        <input type="text" id="molecule-name" placeholder="Enter molecule name (e.g., caffeine)">
+    <div class="container">
+        <h1>Molecule Viewer</h1>
+        <input type="text" id="molecule-name" placeholder="Enter molecule name">
         <button id="load-molecule">Load Molecule</button>
+        <div id="viewer" class="viewer-container"></div>
     </div>
-    <div id="viewer-container"></div>
-
     <script src="script.js"></script>
 </body>
 </html>
