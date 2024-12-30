@@ -15,12 +15,19 @@ document.getElementById('load-molecule').addEventListener('click', () => {
             return response.text();
         })
         .then(sdfData => {
-            const viewer = $3Dmol.createViewer("viewer", { backgroundColor: "white" });
+            const viewer = $3Dmol.createViewer("viewer", { backgroundColor: "#000000" });
             viewer.addModel(sdfData, "sdf");
-            viewer.setStyle({}, { stick: { colorscheme: "Jmol" } });
+            viewer.setStyle({}, { stick: { colorscheme: "Jmol", radius: 0.15, clickable: true } });
             viewer.zoomTo();
             viewer.render();
             alert('Molecule loaded successfully!');
+
+            viewer.zoomTo({ bonds: 1 });
+            viewer.setStyle({ bonds: 1 }, { stick: { colorscheme: "Jmol", radius: 0.2, clickable: true, callback: function(atom) {
+                viewer.zoomTo({ serial: atom.serial });
+                viewer.render();
+            } } });
+
         })
         .catch(error => {
             alert('Error: ' + error.message);
