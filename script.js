@@ -59,19 +59,32 @@ M  END
     }
 
     init() {
-        // Initialize viewer
-        this.viewer = $3Dmol.createViewer(document.getElementById('viewer_container'), {
-            backgroundColor: 'white'
+    // Initialize viewer with proper positioning
+        const viewerContainer = document.getElementById('viewer_container');
+        this.viewer = $3Dmol.createViewer(viewerContainer, {
+            backgroundColor: 'white',
+            id: 'molecule_viewer', // Add unique ID
+            width: '100%',        // Set width to 100%
+            height: '100%',       // Set height to 100%
+            defaultcolors: $3Dmol.elementColors.Jmol
         });
 
-        // Add event listeners
+    // Add event listeners
         document.getElementById('loadButton').addEventListener('click', () => this.loadMolecule());
-        
-        // Initial viewer setup
-        this.viewer.setStyle({}, {stick: {}});
+    
+    // Initial viewer setup with better defaults
+        this.viewer.setStyle({}, {
+            stick: {
+                radius: 0.2,
+                colorscheme: 'Jmol'
+            }
+        });
+    
+    // Center and zoom
         this.viewer.zoomTo();
+        this.viewer.center();    // Add this line to center the view
         this.viewer.render();
-    }
+}
 
     loadMolecule() {
         const select = document.getElementById('moleculeSelect');
