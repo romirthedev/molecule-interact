@@ -1,48 +1,35 @@
-// Create a 3Dmol.js viewer
-const viewerContainer = document.getElementById("viewer-container");
-const viewer = $3Dmol.createViewer(viewerContainer, {
-    backgroundColor: "#202020",
-});
+document.getElementById("load-molecule").addEventListener("click", async () => {
+    const moleculeName = document.getElementById("molecule-name").value.trim();
+    const viewerContainer = document.getElementById("viewer-container");
 
-// Function to fetch and load a molecule
-async function loadMolecule(name) {
-    const apiUrl = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${name}/SDF`;
+    if (!moleculeName) {
+        alert("Please enter a molecule name!");
+        return;
+    }
+
+    // Clear the viewer container before rendering a new molecule
+    viewerContainer.innerHTML = "";
+
+    // Initialize the 3Dmol.js viewer
+    const viewer = $3Dmol.createViewer("viewer-container", { backgroundColor: "gray" });
+
     try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error("Molecule not found in PubChem.");
+        // Fetch molecule data in SDF format from the NCI resolver
+        const response = await fetch(`https://cactus.nci.nih.gov/chemical/structure/${moleculeName}/file?format=sdf`);
+        if (!response.ok) throw new Error("Molecule not found!");
 
         const sdfData = await response.text();
-        if (!sdfData || sdfData.trim() === "") throw new Error("No data received.");
 
-        // Clear the viewer and add the new molecule
-        viewer.clear();
+        // Load and render the molecule
         viewer.addModel(sdfData, "sdf");
         viewer.setStyle({}, { stick: { colorscheme: "Jmol" } });
         viewer.zoomTo();
         viewer.render();
 
-        alert(`Molecule "${name}" loaded successfully!`);
+        // Display a success message
+        alert(`Molecule "${moleculeName}" loaded! Click on bonds to explore.`);
     } catch (error) {
-        alert(`Error: ${error.message}`);
-    }
-}
-
-// Add event listener to the load button
-document.getElementById("load-button").addEventListener("click", () => {
-    const moleculeName = document.getElementById("molecule-input").value.trim();
-    if (moleculeName) {
-        loadMolecule(moleculeName);
-    } else {
-        alert("Please enter a molecule name.");
-    }
-});
-
-// Add click event listener for molecule interactions
-viewer.onClick(function (atom, viewer, event) {
-    if (atom) {
-        const info = `You clicked on ${atom.elem} (atom index: ${atom.index})`;
-        alert(info);
-        viewer.zoomTo({ serial: atom.serial });
-        viewer.render();
+        console.error("Error loading molecule:", error);
+        alert("Failed to load the molecule. Please check the name and try again.");
     }
 });
