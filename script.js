@@ -55,41 +55,51 @@ Water (H2O)
 M  END
             `
         };
-        this.init();
+        // Wait for DOM to be fully loaded before initialization
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.init());
+        } else {
+            this.init();
+        }
     }
 
     init() {
-    // Initialize viewer with proper positioning
         const viewerContainer = document.getElementById('viewer_container');
+        
+        // Clear any existing content
+        viewerContainer.innerHTML = '';
+        
+        // Create viewer with specific dimensions
         this.viewer = $3Dmol.createViewer(viewerContainer, {
             backgroundColor: 'white',
-            id: 'molecule_viewer', // Add unique ID
-            width: '100%',        // Set width to 100%
-            height: '100%',       // Set height to 100%
-            defaultcolors: $3Dmol.elementColors.Jmol
+            id: 'molecule_viewer',
+            width: '100%',
+            height: '100%'
         });
 
-    // Add event listeners
+        // Add event listeners
         document.getElementById('loadButton').addEventListener('click', () => this.loadMolecule());
-    
-    // Initial viewer setup with better defaults
+        
+        // Initial viewer setup
         this.viewer.setStyle({}, {
             stick: {
-                radius: 0.2,
-                colorscheme: 'Jmol'
+                colorscheme: 'Jmol',
+                radius: 0.2
             }
         });
-    
-    // Center and zoom
-        this.viewer.zoomTo();
-        this.viewer.center();    // Add this line to center the view
-        this.viewer.render();
-}
+
+        // Ensure proper sizing and centering
+        window.requestAnimationFrame(() => {
+            this.viewer.resize();
+            this.viewer.center();
+            this.viewer.zoomTo();
+            this.viewer.render();
+        });
+    }
 
     loadMolecule() {
         const select = document.getElementById('moleculeSelect');
         const selectedMolecule = select.value;
-        const messageDiv = document.getElementById('message');
 
         if (!selectedMolecule) {
             this.showMessage('Please select a molecule first.', 'error');
@@ -120,7 +130,9 @@ M  END
                 showBackground: false
             });
 
-            // Zoom to fit
+            // Ensure proper sizing and centering
+            this.viewer.resize();
+            this.viewer.center();
             this.viewer.zoomTo();
             this.viewer.render();
 
@@ -134,6 +146,7 @@ M  END
         const messageDiv = document.getElementById('message');
         messageDiv.textContent = text;
         messageDiv.className = `message ${type}`;
+        messageDiv.style.display = 'block';
         
         // Hide message after 3 seconds
         setTimeout(() => {
