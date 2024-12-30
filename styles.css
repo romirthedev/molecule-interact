@@ -8,12 +8,16 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f5f5f5;
     color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
+    width: 100%;
 }
 
 h1 {
@@ -65,6 +69,17 @@ button:hover {
     border-radius: 8px;
     overflow: hidden;
     background-color: white;
+    /* Fix for 3Dmol.js canvas positioning */
+    position: relative;
+}
+
+/* Important: Add these styles to fix 3Dmol.js canvas positioning */
+#viewer_container canvas {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .message {
