@@ -55,6 +55,18 @@ button:hover {
     overflow: hidden;
 }
 
+#bond_details {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.hidden {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .controls {
         flex-direction: column;
@@ -70,4 +82,3 @@ button:hover {
         width: 100%;
     }
 }
-
