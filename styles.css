@@ -15,9 +15,12 @@ body {
 
 .container {
     max-width: 1200px;
+    width: 100%;
     margin: 0 auto;
     padding: 2rem;
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 h1 {
@@ -69,15 +72,18 @@ button:hover {
     border-radius: 8px;
     overflow: hidden;
     background-color: white;
-    /* Fix for 3Dmol.js canvas positioning */
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
 }
 
-/* Important: Add these styles to fix 3Dmol.js canvas positioning */
 #viewer_container canvas {
     position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
     width: 100% !important;
     height: 100% !important;
 }
@@ -94,14 +100,12 @@ button:hover {
     background-color: #d4edda;
     color: #155724;
     border: 1px solid #c3e6cb;
-    display: block;
 }
 
 .message.error {
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
-    display: block;
 }
 
 @media (max-width: 768px) {
