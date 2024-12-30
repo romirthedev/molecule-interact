@@ -98,45 +98,45 @@ M  END
     }
 
     loadMolecule() {
-        const select = document.getElementById('moleculeSelect');
-        const selectedMolecule = select.value;
+    const select = document.getElementById('moleculeSelect');
+    const selectedMolecule = select.value;
 
-        if (!selectedMolecule) {
-            this.showMessage('Please select a molecule first.', 'error');
-            return;
-        }
-
-        try {
-            // Clear previous molecule
-            this.viewer.clear();
-
-            // Load new molecule
-            const data = this.moleculeData[selectedMolecule];
-            const model = this.viewer.addModel(data, "sdf");
-            
-            // Set style with atom display settings
-            this.viewer.setStyle({}, {
-                stick: {
-                    colorscheme: 'Jmol',
-                    radius: 0.2
-                },
-                atoms: {
-                    sphereScale: 0.25
-                }
-            });
-
-            // Ensure proper sizing and centering
-            this.viewer.resize();
-            this.viewer.center();
-            this.viewer.zoomTo();
-            this.viewer.render();
-
-            this.showMessage(`${selectedMolecule.charAt(0).toUpperCase() + selectedMolecule.slice(1)} loaded successfully!`, 'success');
-        } catch (error) {
-            this.showMessage(`Error loading molecule: ${error.message}`, 'error');
-        }
+    if (!selectedMolecule) {
+        this.showMessage('Please select a molecule first.', 'error');
+        return;
     }
 
+    try {
+        // Clear previous molecule
+        this.viewer.clear();
+
+        // Load new molecule
+        const data = this.moleculeData[selectedMolecule];
+        this.viewer.addModel(data, "sdf");
+        
+        // Set style with atoms and bonds
+        this.viewer.setStyle({}, {
+            stick: {
+                colorscheme: 'Jmol',
+                radius: 0.2
+            },
+            sphere: {
+                colorscheme: 'Jmol',
+                scale: 0.3
+            }
+        });
+
+        // Ensure proper sizing and centering
+        this.viewer.resize();
+        this.viewer.center();
+        this.viewer.zoomTo();
+        this.viewer.render();
+
+        this.showMessage(`${selectedMolecule.charAt(0).toUpperCase() + selectedMolecule.slice(1)} loaded successfully!`, 'success');
+    } catch (error) {
+        this.showMessage(`Error loading molecule: ${error.message}`, 'error');
+    }
+}
     showMessage(text, type) {
         const messageDiv = document.getElementById('message');
         messageDiv.textContent = text;
