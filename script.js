@@ -2,9 +2,55 @@ class MoleculeViewer {
     constructor() {
         this.viewer = null;
         this.moleculeData = {
-            methane: `Methane (CH4)\n  CHEMDOOD08070920033D 0   0.00000     0.00000     0\n\n  5  4  0  0  0  0  0  0  0  0999 V2000\n    0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.6294    0.6294    0.6294 H   0  0  0  0  0  0  0  0  0  0  0  0\n    -0.6294   -0.6294    0.6294 H   0  0  0  0  0  0  0  0  0  0  0  0\n    -0.6294    0.6294   -0.6294 H   0  0  0  0  0  0  0  0  0  0  0  0\n    0.6294   -0.6294   -0.6294 H   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  1  0  0  0  0\n  1  3  1  0  0  0  0\n  1  4  1  0  0  0  0\n  1  5  1  0  0  0  0\nM  END`,
-            ethanol: `Ethanol (C2H5OH)\n  CHEMDOOD08070920033D 0   0.00000     0.00000     0\n\n  9  8  0  0  0  0  0  0  0  0999 V2000\n    1.2304   -0.2164    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.2164    0.2164    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.9410   -0.9845    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    1.8584    0.6796    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    1.3889   -0.8124    0.8900 H   0  0  0  0  0  0  0  0  0  0  0  0\n    1.3889   -0.8124   -0.8900 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.3750    0.8124    0.8900 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.3750    0.8124   -0.8900 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.8584   -0.6796    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  1  0  0  0  0\n  2  3  1  0  0  0  0\n  1  4  1  0  0  0  0\n  1  5  1  0  0  0  0\n  1  6  1  0  0  0  0\n  2  7  1  0  0  0  0\n  2  8  1  0  0  0  0\n  3  9  1  0  0  0  0\nM  END`,
-            water: `Water (H2O)\n  CHEMDOOD08070920033D 0   0.00000     0.00000     0\n\n  3  2  0  0  0  0  0  0  0  0999 V2000\n    0.0000    0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    0.7572    0.5858    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.7572    0.5858    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  1  0  0  0  0\n  1  3  1  0  0  0  0\nM  END`
+            methane: 
+`Methane
+  MOL    0
+
+  5  4  0  0  0  0            999 V2000
+    0.0000    0.0000    0.0000 C   0  0  0  0  0
+    0.6294    0.6294    0.6294 H   0  0  0  0  0
+   -0.6294   -0.6294    0.6294 H   0  0  0  0  0
+   -0.6294    0.6294   -0.6294 H   0  0  0  0  0
+    0.6294   -0.6294   -0.6294 H   0  0  0  0  0
+  1  2  1  0  0  0
+  1  3  1  0  0  0
+  1  4  1  0  0  0
+  1  5  1  0  0  0
+M  END`,
+            ethanol:
+`Ethanol
+  MOL    0
+
+  9  8  0  0  0  0            999 V2000
+    1.2304   -0.2164    0.0000 C   0  0  0  0  0
+   -0.2164    0.2164    0.0000 C   0  0  0  0  0
+   -0.9410   -0.9845    0.0000 O   0  0  0  0  0
+    1.8584    0.6796    0.0000 H   0  0  0  0  0
+    1.3889   -0.8124    0.8900 H   0  0  0  0  0
+    1.3889   -0.8124   -0.8900 H   0  0  0  0  0
+   -0.3750    0.8124    0.8900 H   0  0  0  0  0
+   -0.3750    0.8124   -0.8900 H   0  0  0  0  0
+   -1.8584   -0.6796    0.0000 H   0  0  0  0  0
+  1  2  1  0  0  0
+  2  3  1  0  0  0
+  1  4  1  0  0  0
+  1  5  1  0  0  0
+  1  6  1  0  0  0
+  2  7  1  0  0  0
+  2  8  1  0  0  0
+  3  9  1  0  0  0
+M  END`,
+            water:
+`Water
+  MOL    0
+
+  3  2  0  0  0  0            999 V2000
+    0.0000    0.0000    0.0000 O   0  0  0  0  0
+    0.7572    0.5858    0.0000 H   0  0  0  0  0
+   -0.7572    0.5858    0.0000 H   0  0  0  0  0
+  1  2  1  0  0  0
+  1  3  1  0  0  0
+M  END`
         };
 
         if (document.readyState === 'loading') {
@@ -19,6 +65,14 @@ class MoleculeViewer {
         viewerContainer.innerHTML = '';
         
         console.log('Initializing viewer...');
+        
+        // Make sure required libraries are loaded
+        if (typeof($) === 'undefined' || typeof($3Dmol) === 'undefined') {
+            console.error('Required libraries not loaded');
+            this.showMessage('Error: Required libraries not loaded', 'error');
+            return;
+        }
+
         this.viewer = $3Dmol.createViewer(viewerContainer, {
             backgroundColor: 'white',
             id: 'molecule_viewer',
@@ -26,25 +80,21 @@ class MoleculeViewer {
             height: '100%'
         });
 
-        document.getElementById('loadButton').addEventListener('click', () => this.loadMolecule());
-        
-        this.viewer.setStyle({}, {
-            stick: {
-                colorscheme: 'Jmol',
-                radius: 0.2
-            }
-        });
+        if (!this.viewer) {
+            console.error('Failed to create viewer');
+            this.showMessage('Error: Failed to create viewer', 'error');
+            return;
+        }
 
-        window.requestAnimationFrame(() => {
-            this.viewer.resize();
-            this.viewer.render();
-            console.log('Initial viewer setup complete');
-        });
+        document.getElementById('loadButton').addEventListener('click', () => this.loadMolecule());
+        console.log('Viewer created successfully');
     }
 
     loadMolecule() {
         const select = document.getElementById('moleculeSelect');
         const selectedMolecule = select.value;
+
+        console.log('Selected molecule:', selectedMolecule);
 
         if (!selectedMolecule) {
             this.showMessage('Please select a molecule first.', 'error');
@@ -56,9 +106,9 @@ class MoleculeViewer {
             this.viewer.clear();
 
             const data = this.moleculeData[selectedMolecule];
-            console.log('Molecule data:', data);
+            console.log('Molecule data (first 100 chars):', data.substring(0, 100));
             
-            this.viewer.addModel(data, "sdf");
+            this.viewer.addModel(data, "mol");
             
             this.viewer.setStyle({}, {
                 stick: {
@@ -72,8 +122,12 @@ class MoleculeViewer {
             });
 
             this.viewer.zoomTo();
-            this.viewer.render();
-            console.log('Molecule rendered successfully');
+            this.viewer.center();
+            
+            window.requestAnimationFrame(() => {
+                this.viewer.render();
+                console.log('Molecule rendered successfully');
+            });
 
             this.showMessage(`${selectedMolecule.charAt(0).toUpperCase() + selectedMolecule.slice(1)} loaded successfully!`, 'success');
         } catch (error) {
@@ -85,4 +139,16 @@ class MoleculeViewer {
     showMessage(text, type) {
         const messageDiv = document.getElementById('message');
         messageDiv.textContent = text;
-        messageDiv.className = `message
+        messageDiv.className = `message ${type}`;
+        messageDiv.style.display = 'block';
+        
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 3000);
+    }
+}
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', () => {
+    new MoleculeViewer();
+});
