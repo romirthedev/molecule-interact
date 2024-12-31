@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Molecule Viewer</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.0.1/3Dmol-min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -16,7 +17,7 @@
                 <option value="">Select a molecule</option>
                 <option value="methane">Methane (CH₄)</option>
                 <option value="ethanol">Ethanol (C₂H₅OH)</option>
-                <option value="glucose">Glucose (C₆H₁₂O₆)</option>
+                <option value="water">Water (H₂O)</option>
             </select>
             <button id="loadButton">Load Molecule</button>
         </div>
