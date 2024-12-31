@@ -55,102 +55,47 @@ Water (H2O)
 M  END
             `
         };
-        // Wait for DOM to be fully loaded before initialization
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.init());
-        } else {
-            this.init();
-        }
+        this.init();
     }
 
     init() {
         const viewerContainer = document.getElementById('viewer_container');
-        
-        // Clear any existing content
-        viewerContainer.innerHTML = '';
-        
-        // Create viewer with specific dimensions
-        this.viewer = $3Dmol.createViewer(viewerContainer, {
-            backgroundColor: 'white',
-            id: 'molecule_viewer',
-            width: '100%',
-            height: '100%'
-        });
+        if (!viewerContainer) {
+            console.error('Viewer container not found.');
+            return;
+        }
 
-        // Add event listeners
+        this.viewer = $3Dmol.createViewer(viewerContainer, { backgroundColor: 'white' });
+
+        // Attach event listeners
         document.getElementById('loadButton').addEventListener('click', () => this.loadMolecule());
-        
-        // Initial viewer setup
-        this.viewer.setStyle({}, {
-            stick: {
-                colorscheme: 'Jmol',
-                radius: 0.2
-            }
-        });
-
-        // Ensure proper sizing and centering
-        window.requestAnimationFrame(() => {
-            this.viewer.resize();
-            this.viewer.center();
-            this.viewer.zoomTo();
-            this.viewer.render();
-        });
     }
 
     loadMolecule() {
-    const select = document.getElementById('moleculeSelect');
-    const selectedMolecule = select.value;
+        const select = document.getElementById('moleculeSelect');
+        const selectedMolecule = select.value;
 
-    if (!selectedMolecule) {
-        this.showMessage('Please select a molecule first.', 'error');
-        return;
-    }
+        if (!this.moleculeData[selectedMolecule]) {
+            this.showMessage('Molecule data not found.', 'error');
+            return;
+        }
 
-    try {
-        // Clear previous molecule
         this.viewer.clear();
-
-        // Load new molecule
-        const data = this.moleculeData[selectedMolecule];
-        this.viewer.addModel(data, "sdf");
-        
-        // Set style with atoms and bonds
-        this.viewer.setStyle({}, {
-            stick: {
-                colorscheme: 'Jmol',
-                radius: 0.2
-            },
-            sphere: {
-                colorscheme: 'Jmol',
-                scale: 0.3
-            }
-        });
-
-        // Ensure proper sizing and centering
-        this.viewer.resize();
-        this.viewer.center();
+        this.viewer.addModel(this.moleculeData[selectedMolecule], 'sdf');
+        this.viewer.setStyle({}, { stick: { colorscheme: 'Jmol', radius: 0.2 } });
         this.viewer.zoomTo();
         this.viewer.render();
-
-        this.showMessage(`${selectedMolecule.charAt(0).toUpperCase() + selectedMolecule.slice(1)} loaded successfully!`, 'success');
-    } catch (error) {
-        this.showMessage(`Error loading molecule: ${error.message}`, 'error');
+        this.showMessage(`Loaded ${selectedMolecule}.`, 'success');
     }
-}
-    showMessage(text, type) {
+
+    showMessage(message, type) {
         const messageDiv = document.getElementById('message');
-        messageDiv.textContent = text;
-        messageDiv.className = `message ${type}`;
-        messageDiv.style.display = 'block';
-        
-        // Hide message after 3 seconds
-        setTimeout(() => {
-            messageDiv.style.display = 'none';
-        }, 3000);
+        if (!messageDiv) return;
+
+        messageDiv.textContent = message;
+        messageDiv.className = type;
+        setTimeout(() => (messageDiv.textContent = ''), 3000);
     }
 }
 
-// Initialize the application
-document.addEventListener('DOMContentLoaded', () => {
-    new MoleculeViewer();
-});
+document.addEventListener('DOMContentLoaded', () => new MoleculeViewer());
