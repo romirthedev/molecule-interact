@@ -1,10 +1,9 @@
 class MoleculeViewer {
     constructor() {
         this.viewer = null;
-        this.currentMolecule = null;
-        // Molecule data with proper MOL format
         this.moleculeData = {
-            methane: `Methane
+            methane: 
+`Methane
   MOL    0
 
   5  4  0  0  0  0            999 V2000
@@ -18,7 +17,8 @@ class MoleculeViewer {
   1  4  1  0  0  0
   1  5  1  0  0  0
 M  END`,
-            ethanol: `Ethanol
+            ethanol:
+`Ethanol
   MOL    0
 
   9  8  0  0  0  0            999 V2000
@@ -40,7 +40,8 @@ M  END`,
   2  8  1  0  0  0
   3  9  1  0  0  0
 M  END`,
-            water: `Water
+            water:
+`Water
   MOL    0
 
   3  2  0  0  0  0            999 V2000
@@ -52,36 +53,6 @@ M  END`,
 M  END`
         };
 
-        // Molecule information for labels and descriptions
-        this.moleculeInfo = {
-            methane: {
-                bonds: [
-                    { atoms: [0, 1], label: 'C-H Bond', desc: 'Carbon-Hydrogen covalent bond' }
-                ],
-                formula: 'CH₄',
-                description: 'Simplest hydrocarbon'
-            },
-            ethanol: {
-                bonds: [
-                    { atoms: [0, 1], label: 'C-C Bond', desc: 'Carbon-Carbon single bond' },
-                    { atoms: [1, 2], label: 'C-O Bond', desc: 'Carbon-Oxygen bond (hydroxyl group)' }
-                ],
-                formula: 'C₂H₅OH',
-                description: 'Alcohol compound'
-            },
-            water: {
-                bonds: [
-                    { atoms: [0, 1], label: 'O-H Bond', desc: 'Oxygen-Hydrogen polar bond' }
-                ],
-                formula: 'H₂O',
-                description: 'Essential compound for life'
-            }
-        };
-
-        this.initOnLoad();
-    }
-
-    initOnLoad() {
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.init());
         } else {
@@ -90,194 +61,94 @@ M  END`
     }
 
     init() {
-        console.log('Initializing viewer...');
         const viewerContainer = document.getElementById('viewer_container');
-        
-        // Ensure container is empty
         viewerContainer.innerHTML = '';
-
-        // Check for required libraries
+        
+        console.log('Initializing viewer...');
+        
+        // Make sure required libraries are loaded
         if (typeof($) === 'undefined' || typeof($3Dmol) === 'undefined') {
-            this.showMessage('Required libraries not loaded', 'error');
+            console.error('Required libraries not loaded');
+            this.showMessage('Error: Required libraries not loaded', 'error');
             return;
         }
 
-        // Create viewer with modern styling
         this.viewer = $3Dmol.createViewer(viewerContainer, {
-            backgroundColor: 'transparent',
+            backgroundColor: 'white',
             id: 'molecule_viewer',
             width: '100%',
-            height: '400px'
+            height: '100%'
         });
 
-        // Set up event listeners
+        if (!this.viewer) {
+            console.error('Failed to create viewer');
+            this.showMessage('Error: Failed to create viewer', 'error');
+            return;
+        }
+
         document.getElementById('loadButton').addEventListener('click', () => this.loadMolecule());
-        this.setupKeyboardControls();
-        
-        // Start animation loop
-        this.animate();
+        console.log('Viewer created successfully');
     }
 
     loadMolecule() {
         const select = document.getElementById('moleculeSelect');
         const selectedMolecule = select.value;
 
+        console.log('Selected molecule:', selectedMolecule);
+
         if (!selectedMolecule) {
-            this.showMessage('Please select a molecule', 'error');
+            this.showMessage('Please select a molecule first.', 'error');
             return;
         }
 
         try {
             console.log(`Loading molecule: ${selectedMolecule}`);
-            
-            // Clear current view
             this.viewer.clear();
-            
-            // Load molecule data
-            const molData = this.moleculeData[selectedMolecule];
-            this.currentMolecule = selectedMolecule;
 
-            // Add model with enhanced styling
-            this.viewer.addModel(molData, "mol");
+            const data = this.moleculeData[selectedMolecule];
+            console.log('Molecule data (first 100 chars):', data.substring(0, 100));
+            
+            this.viewer.addModel(data, "mol");
+            
             this.viewer.setStyle({}, {
                 stick: {
                     colorscheme: 'Jmol',
-                    radius: 0.2,
-                    opacity: 0.9
+                    radius: 0.2
                 },
                 sphere: {
                     colorscheme: 'Jmol',
-                    scale: 0.3,
-                    opacity: 0.9
+                    scale: 0.3
                 }
             });
 
-            // Add clickable labels
-            this.addMoleculeLabels(selectedMolecule);
-
-            // Center and zoom with animation
             this.viewer.zoomTo();
             this.viewer.center();
             
-            // Trigger render with fade-in effect
-            const viewerElement = document.getElementById('viewer_container');
-            viewerElement.style.opacity = '0';
-            
-            requestAnimationFrame(() => {
+            window.requestAnimationFrame(() => {
                 this.viewer.render();
-                viewerElement.style.opacity = '1';
-                viewerElement.style.transition = 'opacity 0.5s ease-in-out';
+                console.log('Molecule rendered successfully');
             });
 
-            // Show molecule info
-            this.showMoleculeInfo(selectedMolecule);
-            
-            this.showMessage(`${selectedMolecule.charAt(0).toUpperCase() + selectedMolecule.slice(1)} loaded`, 'success');
+            this.showMessage(`${selectedMolecule.charAt(0).toUpperCase() + selectedMolecule.slice(1)} loaded successfully!`, 'success');
         } catch (error) {
-            console.error('Loading error:', error);
+            console.error('Error loading molecule:', error);
             this.showMessage(`Error loading molecule: ${error.message}`, 'error');
         }
     }
 
-    addMoleculeLabels(moleculeName) {
-        const info = this.moleculeInfo[moleculeName];
-        if (!info || !info.bonds) return;
-
-        info.bonds.forEach(bond => {
-            this.viewer.addLabel(bond.label, {
-                position: { x: 0, y: 0, z: 0 },
-                backgroundColor: 'rgba(0,0,0,0.8)',
-                fontColor: 'white',
-                fontSize: 12,
-                borderRadius: 10,
-                padding: 5,
-                clickable: true
-            });
-        });
-    }
-
-    showMoleculeInfo(moleculeName) {
-        const info = this.moleculeInfo[moleculeName];
-        const infoContainer = document.getElementById('info_container');
-        
-        if (!info || !infoContainer) return;
-
-        infoContainer.innerHTML = `
-            <div class="molecule-info">
-                <h2>${info.formula}</h2>
-                <p>${info.description}</p>
-            </div>
-        `;
-
-        // Animate info appearance
-        infoContainer.style.opacity = '0';
-        requestAnimationFrame(() => {
-            infoContainer.style.opacity = '1';
-            infoContainer.style.transition = 'opacity 0.3s ease-in-out';
-        });
-    }
-
     showMessage(text, type) {
         const messageDiv = document.getElementById('message');
-        if (!messageDiv) return;
-
         messageDiv.textContent = text;
         messageDiv.className = `message ${type}`;
-        messageDiv.style.opacity = '0';
-        messageDiv.style.transform = 'translateY(20px)';
         messageDiv.style.display = 'block';
-
-        requestAnimationFrame(() => {
-            messageDiv.style.opacity = '1';
-            messageDiv.style.transform = 'translateY(0)';
-            messageDiv.style.transition = 'all 0.3s ease-out';
-        });
-
+        
         setTimeout(() => {
-            messageDiv.style.opacity = '0';
-            messageDiv.style.transform = 'translateY(-20px)';
-            messageDiv.style.transition = 'all 0.3s ease-in';
-            
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 300);
+            messageDiv.style.display = 'none';
         }, 3000);
-    }
-
-    setupKeyboardControls() {
-        document.addEventListener('keydown', (e) => {
-            switch(e.key) {
-                case 'r':
-                    this.resetView();
-                    break;
-                case '+':
-                case '=':
-                    this.viewer.zoom(1.1);
-                    break;
-                case '-':
-                    this.viewer.zoom(0.9);
-                    break;
-            }
-            this.viewer.render();
-        });
-    }
-
-    resetView() {
-        this.viewer.zoomTo();
-        this.viewer.center();
-        this.viewer.render();
-    }
-
-    animate() {
-        if (this.currentMolecule) {
-            this.viewer.rotate(0.3);
-            this.viewer.render();
-        }
-        requestAnimationFrame(() => this.animate());
     }
 }
 
-// Initialize the viewer
+// Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
     new MoleculeViewer();
 });
