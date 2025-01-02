@@ -153,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
     new MoleculeViewer();
 });
 */
-
 class MoleculeViewer {
     constructor() {
         this.viewer = null;
@@ -207,7 +206,7 @@ M  END`,
 M  END`
         };
 
-        // Modern color schemes for each molecule
+        // Modern color schemes for molecules
         this.moleculeStyles = {
             methane: {
                 stickColor: '0x4a90e2',    // Modern blue
@@ -253,10 +252,11 @@ M  END`
         }
 
         this.viewer = $3Dmol.createViewer(viewerContainer, {
-            backgroundColor: 'rgb(240, 242, 245)',  // Light gray background
+            backgroundColor: 'rgb(240, 242, 245)',
             id: 'molecule_viewer',
             width: '100%',
-            height: '100%'
+            height: '100%',
+            renderStyle: "stick"
         });
 
         if (!this.viewer) {
@@ -272,7 +272,6 @@ M  END`
     setupEventListeners() {
         document.getElementById('loadButton').addEventListener('click', () => this.loadMolecule());
         
-        // Add keyboard controls
         document.addEventListener('keydown', (e) => {
             if (!this.currentMolecule) return;
             
@@ -314,33 +313,38 @@ M  END`
             const data = this.moleculeData[selectedMolecule];
             const style = this.moleculeStyles[selectedMolecule];
 
-            this.viewer.addModel(data, "mol");
+            // Add model and create bonds
+            let model = this.viewer.addModel(data, "mol");
+            model.connect(model.selectedAtoms());
 
-            // Set base style for all atoms
+            // Base style for bonds and atoms
             this.viewer.setStyle({}, {
                 stick: {
+                    radius: 0.15,
                     color: style.stickColor,
-                    radius: 0.1,
                     opacity: 1
                 },
                 sphere: {
+                    radius: 0.5,
                     scale: 0.3,
                     opacity: 1
                 }
             });
 
-            // Apply specific colors for each atom type
+            // Specific atom styles
             Object.entries(style.sphereColors).forEach(([atom, color]) => {
                 this.viewer.setStyle({atom: atom}, {
                     sphere: {
                         color: color,
-                        scale: atom === 'H' ? 0.2 : 0.35
+                        scale: atom === 'H' ? 0.25 : 0.4
                     }
                 });
             });
 
+            // Position molecule
             this.viewer.zoomTo();
             this.viewer.center();
+            this.viewer.render();
 
             // Entrance animation
             this.playEntranceAnimation();
@@ -381,7 +385,6 @@ M  END`
         messageDiv.textContent = text;
         messageDiv.className = `message ${type}`;
         
-        // Enhanced message animation
         messageDiv.style.opacity = '0';
         messageDiv.style.transform = 'translateY(-20px)';
         messageDiv.style.display = 'block';
