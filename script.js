@@ -158,70 +158,70 @@ class MoleculeViewer {
     constructor() {
         this.viewer = null;
         this.currentMolecule = null;
-        // Original molecule data - keep this exactly as it was since it was working
+        // Keep the original working molecule data
         this.moleculeData = {
-            methane: `
-Methane (CH4)
-  CHEMDOOD08070920033D 0   0.00000     0.00000     0
- 
-  5  4  0  0  0  0  0  0  0  0999 V2000
-    0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
-    0.6294    0.6294    0.6294 H   0  0  0  0  0  0  0  0  0  0  0  0
-    -0.6294   -0.6294    0.6294 H   0  0  0  0  0  0  0  0  0  0  0  0
-    -0.6294    0.6294   -0.6294 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.6294   -0.6294   -0.6294 H   0  0  0  0  0  0  0  0  0  0  0  0
-  1  2  1  0  0  0  0
-  1  3  1  0  0  0  0
-  1  4  1  0  0  0  0
-  1  5  1  0  0  0  0
-M  END
-            `,
-            ethanol: `
-Ethanol (C2H5OH)
-  CHEMDOOD08070920033D 0   0.00000     0.00000     0
- 
-  9  8  0  0  0  0  0  0  0  0999 V2000
-    1.2304   -0.2164    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.2164    0.2164    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.9410   -0.9845    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
-    1.8584    0.6796    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0
-    1.3889   -0.8124    0.8900 H   0  0  0  0  0  0  0  0  0  0  0  0
-    1.3889   -0.8124   -0.8900 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.3750    0.8124    0.8900 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.3750    0.8124   -0.8900 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.8584   -0.6796    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0
-  1  2  1  0  0  0  0
-  2  3  1  0  0  0  0
-  1  4  1  0  0  0  0
-  1  5  1  0  0  0  0
-  1  6  1  0  0  0  0
-  2  7  1  0  0  0  0
-  2  8  1  0  0  0  0
-  3  9  1  0  0  0  0
-M  END
-            `,
-            water: `
-Water (H2O)
-  CHEMDOOD08070920033D 0   0.00000     0.00000     0
- 
-  3  2  0  0  0  0  0  0  0  0999 V2000
-    0.0000    0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
-    0.7572    0.5858    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.7572    0.5858    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0
-  1  2  1  0  0  0  0
-  1  3  1  0  0  0  0
-M  END
-            `
+            methane: `Methane
+  MOL    0
+
+  5  4  0  0  0  0            999 V2000
+    0.0000    0.0000    0.0000 C   0  0  0  0  0
+    0.6294    0.6294    0.6294 H   0  0  0  0  0
+   -0.6294   -0.6294    0.6294 H   0  0  0  0  0
+   -0.6294    0.6294   -0.6294 H   0  0  0  0  0
+    0.6294   -0.6294   -0.6294 H   0  0  0  0  0
+  1  2  1  0  0  0
+  1  3  1  0  0  0
+  1  4  1  0  0  0
+  1  5  1  0  0  0
+M  END`,
+            ethanol: `Ethanol
+  MOL    0
+
+  9  8  0  0  0  0            999 V2000
+    1.2304   -0.2164    0.0000 C   0  0  0  0  0
+   -0.2164    0.2164    0.0000 C   0  0  0  0  0
+   -0.9410   -0.9845    0.0000 O   0  0  0  0  0
+    1.8584    0.6796    0.0000 H   0  0  0  0  0
+    1.3889   -0.8124    0.8900 H   0  0  0  0  0
+    1.3889   -0.8124   -0.8900 H   0  0  0  0  0
+   -0.3750    0.8124    0.8900 H   0  0  0  0  0
+   -0.3750    0.8124   -0.8900 H   0  0  0  0  0
+   -1.8584   -0.6796    0.0000 H   0  0  0  0  0
+  1  2  1  0  0  0
+  2  3  1  0  0  0
+  1  4  1  0  0  0
+  1  5  1  0  0  0
+  1  6  1  0  0  0
+  2  7  1  0  0  0
+  2  8  1  0  0  0
+  3  9  1  0  0  0
+M  END`,
+            water: `Water
+  MOL    0
+
+  3  2  0  0  0  0            999 V2000
+    0.0000    0.0000    0.0000 O   0  0  0  0  0
+    0.7572    0.5858    0.0000 H   0  0  0  0  0
+   -0.7572    0.5858    0.0000 H   0  0  0  0  0
+  1  2  1  0  0  0
+  1  3  1  0  0  0
+M  END`
         };
 
-        // Bond information for highlighting
-        this.bondInfo = {
-            methane: [{ from: 0, to: 1, label: 'C-H Bond' }],
-            ethanol: [
-                { from: 0, to: 1, label: 'C-C Bond' },
-                { from: 1, to: 2, label: 'C-O Bond' }
-            ],
-            water: [{ from: 0, to: 1, label: 'O-H Bond' }]
+        // Add metadata for enhanced visualization
+        this.moleculeMetadata = {
+            methane: {
+                keyBonds: [[0, 1]], // C-H bond
+                color: '0x00FF00'
+            },
+            ethanol: {
+                keyBonds: [[0, 1], [1, 2]], // C-C and C-O bonds
+                color: '0x0000FF'
+            },
+            water: {
+                keyBonds: [[0, 1]], // O-H bond
+                color: '0xFF0000'
+            }
         };
 
         if (document.readyState === 'loading') {
@@ -235,6 +235,14 @@ M  END
         const viewerContainer = document.getElementById('viewer_container');
         viewerContainer.innerHTML = '';
         
+        console.log('Initializing viewer...');
+        
+        if (typeof($) === 'undefined' || typeof($3Dmol) === 'undefined') {
+            console.error('Required libraries not loaded');
+            this.showMessage('Error: Required libraries not loaded', 'error');
+            return;
+        }
+
         this.viewer = $3Dmol.createViewer(viewerContainer, {
             backgroundColor: 'white',
             id: 'molecule_viewer',
@@ -242,25 +250,22 @@ M  END
             height: '100%'
         });
 
-        document.getElementById('loadButton').addEventListener('click', () => this.loadMolecule());
-        
-        // Initial viewer setup
-        this.viewer.setStyle({}, {
-            stick: {
-                colorscheme: 'Jmol',
-                radius: 0.2
-            }
-        });
+        if (!this.viewer) {
+            console.error('Failed to create viewer');
+            this.showMessage('Error: Failed to create viewer', 'error');
+            return;
+        }
 
-        window.requestAnimationFrame(() => {
-            this.viewer.resize();
-            this.viewer.render();
-        });
+        document.getElementById('loadButton').addEventListener('click', () => this.loadMolecule());
+        this.setupInteractions();
+        console.log('Viewer created successfully');
     }
 
     loadMolecule() {
         const select = document.getElementById('moleculeSelect');
         const selectedMolecule = select.value;
+
+        console.log('Selected molecule:', selectedMolecule);
 
         if (!selectedMolecule) {
             this.showMessage('Please select a molecule first.', 'error');
@@ -268,36 +273,41 @@ M  END
         }
 
         try {
-            // Clear previous molecule
+            console.log(`Loading molecule: ${selectedMolecule}`);
             this.viewer.clear();
             this.currentMolecule = selectedMolecule;
 
-            // Load new molecule
             const data = this.moleculeData[selectedMolecule];
-            this.viewer.addModel(data, "sdf");
             
-            // Set style with atoms and bonds
+            // Add the model with enhanced styling
+            this.viewer.addModel(data, "mol");
+            
+            // Apply enhanced styling
             this.viewer.setStyle({}, {
                 stick: {
                     colorscheme: 'Jmol',
-                    radius: 0.2
+                    radius: 0.2,
+                    opacity: 0.9
                 },
                 sphere: {
                     colorscheme: 'Jmol',
-                    scale: 0.3
+                    scale: 0.3,
+                    opacity: 0.9
                 }
             });
 
-            // Add highlighting for key bonds after molecule is loaded
-            this.highlightKeyBonds(selectedMolecule);
+            // Add shine effect
+            this.viewer.addSurface($3Dmol.SAS, {
+                opacity: 0.3,
+                color: 'white'
+            });
 
-            // Ensure proper sizing and centering
+            // Initial view setup
             this.viewer.zoomTo();
             this.viewer.center();
-            this.viewer.render();
 
-            // Add smooth rotation animation
-            this.addLoadAnimation();
+            // Start entrance animation
+            this.playEntranceAnimation();
 
             this.showMessage(`${selectedMolecule.charAt(0).toUpperCase() + selectedMolecule.slice(1)} loaded successfully!`, 'success');
         } catch (error) {
@@ -306,37 +316,11 @@ M  END
         }
     }
 
-    highlightKeyBonds(moleculeName) {
-        const bonds = this.bondInfo[moleculeName];
-        if (!bonds) return;
-
-        bonds.forEach(bond => {
-            // Add clickable label near the bond
-            const labelPos = this.calculateBondCenter(bond.from, bond.to);
-            if (labelPos) {
-                this.viewer.addLabel(bond.label, {
-                    position: labelPos,
-                    backgroundColor: 'rgba(0,0,0,0.8)',
-                    fontColor: 'white',
-                    fontSize: 12,
-                    borderRadius: 10,
-                    padding: 5
-                });
-            }
-        });
-    }
-
-    calculateBondCenter(fromAtom, toAtom) {
-        // This is a placeholder - you'll need to calculate actual positions
-        // based on your molecule's structure
-        return { x: 0, y: 0, z: 0 };
-    }
-
-    addLoadAnimation() {
+    playEntranceAnimation() {
         let frames = 0;
         const animate = () => {
-            if (frames < 30) { // Rotate for 30 frames
-                this.viewer.rotate(1);
+            if (frames < 30) {
+                this.viewer.rotate(3);
                 this.viewer.render();
                 frames++;
                 requestAnimationFrame(animate);
@@ -345,14 +329,88 @@ M  END
         animate();
     }
 
+    setupInteractions() {
+        // Add click handler
+        this.viewer.clicked = (atom) => {
+            if (atom && this.currentMolecule) {
+                this.handleAtomClick(atom);
+            }
+        };
+
+        // Add keyboard controls
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    this.viewer.rotate(5);
+                    break;
+                case 'ArrowRight':
+                    this.viewer.rotate(-5);
+                    break;
+                case '+':
+                    this.viewer.zoom(1.1);
+                    break;
+                case '-':
+                    this.viewer.zoom(0.9);
+                    break;
+            }
+            this.viewer.render();
+        });
+    }
+
+    handleAtomClick(atom) {
+        const metadata = this.moleculeMetadata[this.currentMolecule];
+        if (!metadata) return;
+
+        // Highlight clicked atom and its bonds
+        this.viewer.setStyle({}, {
+            stick: {
+                colorscheme: 'Jmol',
+                radius: 0.2
+            },
+            sphere: {
+                colorscheme: 'Jmol',
+                scale: 0.3
+            }
+        });
+
+        this.viewer.setStyle({serial: atom.serial}, {
+            stick: {
+                color: metadata.color,
+                radius: 0.3
+            },
+            sphere: {
+                color: metadata.color,
+                scale: 0.4
+            }
+        });
+
+        this.viewer.render();
+    }
+
     showMessage(text, type) {
         const messageDiv = document.getElementById('message');
         messageDiv.textContent = text;
         messageDiv.className = `message ${type}`;
+        
+        // Enhanced message animation
+        messageDiv.style.opacity = '0';
+        messageDiv.style.transform = 'translateY(-20px)';
         messageDiv.style.display = 'block';
         
+        requestAnimationFrame(() => {
+            messageDiv.style.opacity = '1';
+            messageDiv.style.transform = 'translateY(0)';
+            messageDiv.style.transition = 'all 0.3s ease-out';
+        });
+        
         setTimeout(() => {
-            messageDiv.style.display = 'none';
+            messageDiv.style.opacity = '0';
+            messageDiv.style.transform = 'translateY(20px)';
+            messageDiv.style.transition = 'all 0.3s ease-in';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 300);
         }, 3000);
     }
 }
