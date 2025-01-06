@@ -3,16 +3,524 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Molecule Viewer</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <title>Advanced Molecular Explorer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+    <style>
+        :root {
+            --deep-blue: #0a1929;
+            --accent-blue: #1a365d;
+            --highlight-blue: #2d5a9f;
+            --text-color: #e0e7ff;
+        }
+
+        body {
+            margin: 0;
+            background: var(--deep-blue);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+        }
+
+        canvas { display: block; }
+
+        #ui-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 20px;
+            width: 300px;
+            height: 100vh;
+            background: rgba(10, 25, 41, 0.9);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(45, 90, 159, 0.3);
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            text-shadow: 0 0 10px rgba(224, 231, 255, 0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(224, 231, 255, 0.3); }
+            to { text-shadow: 0 0 20px rgba(224, 231, 255, 0.6); }
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            background: var(--accent-blue);
+            color: var(--text-color);
+            border: 1px solid var(--highlight-blue);
+            border-radius: 5px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .info-panel {
+            background: var(--accent-blue);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--highlight-blue);
+        }
+
+        .help-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: var(--highlight-blue);
+            color: var(--text-color);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .help-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(45, 90, 159, 0.5);
+        }
+
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 600px;
+            background: var(--deep-blue);
+            border: 1px solid var(--highlight-blue);
+            border-radius: 10px;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .help-modal.active {
+            display: block;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translate(-50%, -48%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--deep-blue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .loading-circle {
+            width: 100px;
+            height: 100px;
+            border: 5px solid var(--accent-blue);
+            border-top-color: var(--highlight-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <div id="root"></div>
-    <script src="molecule-database.js"></script>
-    <script src="main.js"></script>
+    <div class="loading-screen">
+        <div class="loading-circle"></div>
+    </div>
+
+    <div id="ui-container">
+        <h1 class="title">Molecular Explorer</h1>
+        <select id="molecule-select">
+            <option value="">Select a molecule</option>
+            <option value="water">Water (H₂O)</option>
+            <option value="methane">Methane (CH₄)</option>
+            <option value="ethanol">Ethanol (C₂H₅OH)</option>
+        </select>
+        
+        <div class="info-panel">
+            <h3>Current Molecule</h3>
+            <div id="molecule-info">
+                Select a molecule to view details
+            </div>
+        </div>
+    </div>
+
+    <button class="help-button">Help Guide</button>
+
+    <div class="help-modal">
+        <h2>How to Use the Molecular Explorer</h2>
+        <ul>
+            <li>Select a molecule from the dropdown menu</li>
+            <li>Click and drag to rotate the view</li>
+            <li>Scroll to zoom in/out</li>
+            <li>Click on highlighted bonds to zoom in</li>
+            <li>Press ESC to return to normal view</li>
+        </ul>
+        <button class="help-button">Close</button>
+    </div>
+
+    <script>
+        // Molecule definitions
+        const molecules = {
+            water: {
+                name: "Water (H₂O)",
+                description: "A polar molecule essential for life",
+                atoms: [
+                    { pos: [0, 0, 0], color: 0xff0000, element: 'O', radius: 0.4 },
+                    { pos: [-0.8, 0.6, 0], color: 0xffffff, element: 'H', radius: 0.2 },
+                    { pos: [0.8, 0.6, 0], color: 0xffffff, element: 'H', radius: 0.2 }
+                ],
+                bonds: [
+                    { atoms: [0, 1], order: 1, key: true },
+                    { atoms: [0, 2], order: 1, key: true }
+                ]
+            },
+            methane: {
+                name: "Methane (CH₄)",
+                description: "Simplest hydrocarbon molecule",
+                atoms: [
+                    { pos: [0, 0, 0], color: 0x808080, element: 'C', radius: 0.4 },
+                    { pos: [0.8, 0.8, 0.8], color: 0xffffff, element: 'H', radius: 0.2 },
+                    { pos: [-0.8, -0.8, 0.8], color: 0xffffff, element: 'H', radius: 0.2 },
+                    { pos: [0.8, -0.8, -0.8], color: 0xffffff, element: 'H', radius: 0.2 },
+                    { pos: [-0.8, 0.8, -0.8], color: 0xffffff, element: 'H', radius: 0.2 }
+                ],
+                bonds: [
+                    { atoms: [0, 1], order: 1, key: true },
+                    { atoms: [0, 2], order: 1, key: false },
+                    { atoms: [0, 3], order: 1, key: false },
+                    { atoms: [0, 4], order: 1, key: false }
+                ]
+            },
+            ethanol: {
+                name: "Ethanol (C₂H₅OH)",
+                description: "Common alcohol molecule",
+                atoms: [
+                    { pos: [0, 0, 0], color: 0x808080, element: 'C', radius: 0.4 },
+                    { pos: [1.2, 0, 0], color: 0x808080, element: 'C', radius: 0.4 },
+                    { pos: [2.0, 1.0, 0], color: 0xff0000, element: 'O', radius: 0.4 },
+                    { pos: [-0.5, 0.9, 0], color: 0xffffff, element: 'H', radius: 0.2 },
+                    { pos: [-0.5, -0.9, 0], color: 0xffffff, element: 'H', radius: 0.2 },
+                    { pos: [1.7, -0.9, 0], color: 0xffffff, element: 'H', radius: 0.2 },
+                    { pos: [2.8, 0.7, 0], color: 0xffffff, element: 'H', radius: 0.2 }
+                ],
+                bonds: [
+                    { atoms: [0, 1], order: 1, key: true },
+                    { atoms: [1, 2], order: 1, key: true },
+                    { atoms: [0, 3], order: 1, key: false },
+                    { atoms: [0, 4], order: 1, key: false },
+                    { atoms: [1, 5], order: 1, key: false },
+                    { atoms: [2, 6], order: 1, key: false }
+                ]
+            }
+        };
+
+        // Three.js variables
+        let scene, camera, renderer, controls;
+        let currentMolecule = null;
+        let raycaster, mouse;
+        let selectedBond = null;
+        let isZoomedIn = false;
+
+        // Initialize Three.js scene
+        function init() {
+            // Scene setup
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x0a1929);
+            document.body.appendChild(renderer.domElement);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+
+            const pointLight1 = new THREE.PointLight(0x2d5a9f, 2);
+            pointLight1.position.set(10, 10, 10);
+            scene.add(pointLight1);
+
+            const pointLight2 = new THREE.PointLight(0x2d5a9f, 1);
+            pointLight2.position.set(-10, -10, -10);
+            scene.add(pointLight2);
+
+            // Camera position
+            camera.position.z = 5;
+
+            // Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            // Raycaster setup
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+
+            // Event listeners
+            window.addEventListener('resize', onWindowResize, false);
+            document.addEventListener('mousemove', onMouseMove, false);
+            document.addEventListener('click', onMouseClick, false);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && isZoomedIn) {
+                    resetCamera();
+                }
+            });
+
+            // UI setup
+            setupUI();
+
+            // Start animation loop
+            animate();
+
+            // Remove loading screen
+            setTimeout(() => {
+                document.querySelector('.loading-screen').style.display = 'none';
+            }, 1000);
+        }
+
+        // Create molecule geometry
+        function createMolecule(moleculeData) {
+            if (currentMolecule) {
+                scene.remove(currentMolecule);
+            }
+
+            currentMolecule = new THREE.Group();
+
+            // Create atoms
+            moleculeData.atoms.forEach((atom, index) => {
+                const geometry = new THREE.SphereGeometry(atom.radius, 32, 32);
+                const material = new THREE.MeshPhongMaterial({
+                    color: atom.color,
+                    specular: 0x444444,
+                    shininess: 30
+                });
+                const sphere = new THREE.Mesh(geometry, material);
+                sphere.position.set(...atom.pos);
+                sphere.userData = { type: 'atom', index: index, element: atom.element };
+                currentMolecule.add(sphere);
+            });
+
+            // Create bonds
+            moleculeData.bonds.forEach((bond, index) => {
+                const start = new THREE.Vector3(...moleculeData.atoms[bond.atoms[0]].pos);
+                const end = new THREE.Vector3(...moleculeData.atoms[bond.atoms[1]].pos);
+                const bondGroup = createBond(start, end, bond.key);
+                bondGroup.userData = { type: 'bond', index: index, key: bond.key };
+                currentMolecule.add(bondGroup);
+            });
+
+            scene.add(currentMolecule);
+            updateMoleculeInfo(moleculeData);
+        }
+
+        // Create a single bond with optional highlight ring
+        function createBond(start, end, isKey) {
+            const bondGroup = new THREE.Group();
+            
+            // Main bond cylinder
+            const direction = end.clone().sub(start);
+            const length = direction.length();
+            const bondGeometry = new THREE.CylinderGeometry(0.1, 0.1, length, 12);
+            const bondMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
+            const bond = new THREE.Mesh(bondGeometry, bondMaterial);
+
+            // Position and rotate bond
+            bond.position.copy(start.clone().add(end).multiplyScalar(0.5));
+            bond.quaternion.setFromUnitVectors(
+                new THREE.Vector3(0, 1, 0),
+                direction.normalize()
+            );
+
+            bondGroup.add(bond);
+
+            // Add highlight ring for key bonds
+            if (isKey) {
+                const ringGeometry = new THREE.TorusGeometry(0.3, 0.02, 16, 100);
+                const ringMaterial = new THREE.MeshPhongMaterial({
+                    color: 0x00ff00,
+                    transparent: true,
+                    opacity: 0.7
+                });
+                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                ring.position.copy(bond.position);
+                ring.quaternion.copy(bond.quaternion);
+                ring.rotation.x = Math.PI / 2;
+
+                // Animate ring
+// Animation for the ring
+                const ringAnimation = {
+                    update: function(time) {
+                        ring.scale.x = 1 + Math.sin(time * 2) * 0.1;
+                        ring.scale.y = 1 + Math.sin(time * 2) * 0.1;
+                        ringMaterial.opacity = 0.5 + Math.sin(time * 2) * 0.2;
+                    }
+                };
+                ring.userData = { animation: ringAnimation };
+                bondGroup.add(ring);
+            }
+
+            return bondGroup;
+        }
+
+        // Animation loop
+        function animate(time) {
+            requestAnimationFrame(animate);
+
+            // Update controls
+            controls.update();
+
+            // Animate key bond rings
+            if (currentMolecule) {
+                currentMolecule.traverse((child) => {
+                    if (child.userData?.animation) {
+                        child.userData.animation.update(time * 0.001);
+                    }
+                });
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resizing
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Mouse move handler
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            // Update raycaster
+            raycaster.setFromCamera(mouse, camera);
+
+            if (currentMolecule) {
+                const intersects = raycaster.intersectObject(currentMolecule, true);
+                const bondIntersect = intersects.find(i => i.object.parent?.userData?.type === 'bond');
+
+                if (bondIntersect && bondIntersect.object.parent.userData.key) {
+                    document.body.style.cursor = 'pointer';
+                } else {
+                    document.body.style.cursor = 'default';
+                }
+            }
+        }
+
+        // Mouse click handler
+        function onMouseClick(event) {
+            if (!currentMolecule || isZoomedIn) return;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObject(currentMolecule, true);
+            const bondIntersect = intersects.find(i => i.object.parent?.userData?.type === 'bond');
+
+            if (bondIntersect && bondIntersect.object.parent.userData.key) {
+                zoomToBond(bondIntersect.object.parent);
+            }
+        }
+
+        // Zoom to specific bond
+        function zoomToBond(bondGroup) {
+            isZoomedIn = true;
+            controls.enabled = false;
+
+            const bondPosition = new THREE.Vector3();
+            bondGroup.getWorldPosition(bondPosition);
+
+            const startRotation = currentMolecule.rotation.clone();
+            const endRotation = new THREE.Euler(0, Math.PI / 2, 0);
+
+            const startPos = camera.position.clone();
+            const endPos = bondPosition.clone().add(new THREE.Vector3(0, 0, 2));
+
+            // Create animation
+            new TWEEN.Tween({ pos: startPos, rot: startRotation })
+                .to({ pos: endPos, rot: endRotation }, 1000)
+                .easing(TWEEN.Easing.Quadratic.InOut)
+                .onUpdate(function(obj) {
+                    camera.position.copy(obj.pos);
+                    currentMolecule.rotation.copy(obj.rot);
+                })
+                .onComplete(() => {
+                    controls.enabled = true;
+                })
+                .start();
+        }
+
+        // Reset camera position
+        function resetCamera() {
+            isZoomedIn = false;
+            controls.enabled = false;
+
+            new TWEEN.Tween(camera.position)
+                .to({ x: 0, y: 0, z: 5 }, 1000)
+                .easing(TWEEN.Easing.Quadratic.InOut)
+                .onComplete(() => {
+                    controls.enabled = true;
+                })
+                .start();
+        }
+
+        // Update molecule information panel
+        function updateMoleculeInfo(moleculeData) {
+            const infoPanel = document.getElementById('molecule-info');
+            infoPanel.innerHTML = `
+                <h4>${moleculeData.name}</h4>
+                <p>${moleculeData.description}</p>
+                <p>Atoms: ${moleculeData.atoms.length}</p>
+                <p>Bonds: ${moleculeData.bonds.length}</p>
+                <p>Key bonds: ${moleculeData.bonds.filter(b => b.key).length}</p>
+            `;
+        }
+
+        // Setup UI event handlers
+        function setupUI() {
+            // Molecule selection
+            document.getElementById('molecule-select').addEventListener('change', (e) => {
+                const moleculeName = e.target.value;
+                if (moleculeName && molecules[moleculeName]) {
+                    createMolecule(molecules[moleculeName]);
+                }
+            });
+
+            // Help modal
+            const helpButton = document.querySelector('.help-button');
+            const helpModal = document.querySelector('.help-modal');
+            
+            helpButton.addEventListener('click', () => {
+                helpModal.classList.toggle('active');
+            });
+
+            // Close modal on click outside
+            window.addEventListener('click', (e) => {
+                if (e.target === helpModal) {
+                    helpModal.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize the application
+        init();
+    </script>
 </body>
 </html>
