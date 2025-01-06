@@ -7,7 +7,7 @@ let currentMolecule = null;
 let raycaster, mouse;
 let selectedBond = null;
 let isZoomedIn = false;
-let bloomComposer;
+let bloomComposer; 
 let particleSystem;
 
 // Add Bloom Effect
