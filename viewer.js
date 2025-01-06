@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import TWEEN from '@tweenjs/tween.js';
+import * as TWEEN from '@tweenjs/tween.js';
 
 let scene, camera, renderer, controls;
 let currentMolecule = null;
@@ -85,12 +85,7 @@ function init() {
     controls.rotateSpeed = 0.8;
     controls.zoomSpeed = 1.2;
 
-    // Setup effects
-    setupBloomEffect();
-    createParticleSystem();
-    createBackgroundParticles();
-
-    // Raycaster setup
+    // Setup raycaster
     raycaster = new THREE.Raycaster();
     mouse = new THREE.Vector2();
 
@@ -98,20 +93,32 @@ function init() {
     window.addEventListener('resize', onWindowResize, false);
     document.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('click', onMouseClick, false);
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown, false);
 
-    // Setup UI and start animation
+    // Setup UI elements
     setupUI();
+    setupBloomEffect();
+    createParticleSystem();
+    createBackgroundParticles();
+
+    // Start animation
     animate();
 
     // Remove loading screen
     setTimeout(() => {
-        document.querySelector('.loading-screen').style.opacity = '0';
-        document.querySelector('.controls').classList.add('visible');
-        document.querySelector('.info-panel').classList.add('visible');
-        setTimeout(() => {
-            document.querySelector('.loading-screen').style.display = 'none';
-        }, 500);
+        const loadingScreen = document.querySelector('.loading-screen');
+        const controls = document.querySelector('.controls');
+        const infoPanel = document.querySelector('.info-panel');
+        
+        if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 500);
+        }
+        
+        if (controls) controls.classList.add('visible');
+        if (infoPanel) infoPanel.classList.add('visible');
     }, 1000);
 }
 
@@ -130,17 +137,14 @@ function createParticleSystem() {
     const geometry = new THREE.BufferGeometry();
     const particles = 1000;
     const positions = new Float32Array(particles * 3);
-    const sizes = new Float32Array(particles);
 
-    for (let i = 0; i < particles; i++) {
-        positions[i * 3] = (Math.random() - 0.5) * 100;
-        positions[i * 3 + 1] = (Math.random() - 0.5) * 100;
-        positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
-        sizes[i] = Math.random() * 0.1;
+    for (let i = 0; i < particles * 3; i += 3) {
+        positions[i] = (Math.random() - 0.5) * 100;
+        positions[i + 1] = (Math.random() - 0.5) * 100;
+        positions[i + 2] = (Math.random() - 0.5) * 100;
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
     const material = new THREE.PointsMaterial({
         color: 0x38bdf8,
@@ -173,13 +177,94 @@ function createBackgroundParticles() {
     }
 }
 
+function setupUI() {
+    const select = document.getElementById('molecule-select');
+    if (select) {
+        select.addEventListener('change', (e) => {
+            if (e.target.value) {
+                loadMolecule(e.target.value);
+            }
+        });
+    }
+
+    const helpButton = document.querySelector('.help-button');
+    const helpModal = document.querySelector('.help-modal');
+    
+    if (helpButton && helpModal) {
+        helpButton.addEventListener('click', () => {
+            helpModal.classList.add('active');
+        });
+
+        helpModal.addEventListener('click', (e) => {
+            if (e.target === helpModal) {
+                helpModal.classList.remove('active');
+            }
+        });
+    }
+}
+
+function loadMolecule(name) {
+    // Clear existing scene elements except lights and particles
+    const objectsToRemove = [];
+    scene.traverse((object) => {
+        if (object instanceof THREE.Mesh || object instanceof THREE.Group) {
+            if (object !== particleSystem) {
+                objectsToRemove.push(object);
+            }
+        }
+    });
+    objectsToRemove.forEach(object => scene.remove(object));
+
+    const molecule = molecules[name];
+    if (!molecule) return;
+
+    currentMolecule = {
+        ...molecule,
+        center: new THREE.Vector3(0, 0, 0)
+    };
+
+    // Create atoms
+    molecule.atoms.forEach((atom, index) => {
+        const geometry = new THREE.SphereGeometry(atom.radius, 32, 32);
+        const material = new THREE.MeshPhongMaterial({
+            color: atom.color,
+            shininess: 100
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(...atom.pos);
+        mesh.userData = { atomIndex: index };
+        scene.add(mesh);
+    });
+
+    // Create bonds
+    molecule.bonds.forEach((bond, index) => {
+        const start = new THREE.Vector3(...molecule.atoms[bond.atoms[0]].pos);
+        const end = new THREE.Vector3(...molecule.atoms[bond.atoms[1]].pos);
+        const bondObject = createBond(start, end, bond.key);
+        bondObject.userData = { bondIndex: index };
+    });
+
+    // Update info panel
+    const infoPanel = document.querySelector('.info-panel');
+    if (infoPanel) {
+        infoPanel.innerHTML = `
+            <h4>${molecule.name}</h4>
+            <p>${molecule.description}</p>
+        `;
+    }
+
+    // Reset camera and controls
+    camera.position.set(0, 0, 5);
+    controls.reset();
+}
+
 function createBond(start, end, isKey) {
     const bondGroup = new THREE.Group();
     
     const direction = end.clone().sub(start);
     const length = direction.length();
     
-    const bondGeometry = new THREE.CylinderGeometry(0.08, 0.08, length, 16);
+    const bondGeometry = new THREE.CylinderGeometry(0.05, 0.05, length, 16);
     const bondMaterial = new THREE.MeshPhongMaterial({
         color: 0xffffff,
         emissive: 0x38bdf8,
@@ -188,29 +273,33 @@ function createBond(start, end, isKey) {
     });
     
     const bond = new THREE.Mesh(bondGeometry, bondMaterial);
+    
+    // Position the bond between the atoms
     bond.position.copy(start.clone().add(end).multiplyScalar(0.5));
     bond.quaternion.setFromUnitVectors(
         new THREE.Vector3(0, 1, 0),
         direction.normalize()
     );
-
+    
     bondGroup.add(bond);
 
     if (isKey) {
+        // Add decorative rings for key bonds
+        const ringRadius = 0.15;
         for (let i = 0; i < 3; i++) {
-            const ringGeometry = new THREE.TorusGeometry(0.25, 0.02, 16, 100);
+            const ringGeometry = new THREE.TorusGeometry(ringRadius, 0.02, 16, 32);
             const ringMaterial = new THREE.MeshPhongMaterial({
                 color: 0x38bdf8,
                 transparent: true,
                 opacity: 0.6,
-                                emissive: 0x38bdf8,
+                emissive: 0x38bdf8,
                 emissiveIntensity: 0.4
             });
 
             const ring = new THREE.Mesh(ringGeometry, ringMaterial);
             ring.position.copy(bond.position);
             ring.rotation.x = Math.PI / 2;
-            ring.position.y += (i - 1) * 0.15; // Space out the rings
+            ring.position.y += (i - 1) * 0.2;
             bondGroup.add(ring);
         }
     }
@@ -233,104 +322,48 @@ function onMouseMove(event) {
 
 function onMouseClick(event) {
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(scene.children);
+    const intersects = raycaster.intersectObjects(scene.children, true);
 
     if (intersects.length > 0) {
         const object = intersects[0].object;
-        if (object.userData.atomIndex !== undefined) {
-            highlightAtom(object.userData.atomIndex);
-        } else if (object.userData.bondIndex !== undefined) {
-            selectBond(object.userData.bondIndex);
+        if (object.userData.bondIndex !== undefined) {
+            selectBond(object);
         }
     }
 }
 
-function handleKeyDown(event) {
-    if (event.key === 'z') {
-        toggleZoom();
-    } else if (event.key === 'h') {
-        toggleHighlight();
-    }
-}
-
-function toggleZoom() {
-    if (!isZoomedIn) {
-        const target = currentMolecule.center.clone();
-        const tween = new TWEEN.Tween(camera.position)
-            .to(
-                {
-                    x: target.x + 1.5,
-                    y: target.y + 1.5,
-                    z: target.z + 1.5
-                },
-                1000
-            )
-            .easing(TWEEN.Easing.Quadratic.Out)
-            .start();
-    } else {
-        const tween = new TWEEN.Tween(camera.position)
-            .to({ x: 0, y: 0, z: 5 }, 1000)
-            .easing(TWEEN.Easing.Quadratic.Out)
-            .start();
-    }
-    isZoomedIn = !isZoomedIn;
-}
-
-function toggleHighlight() {
+function selectBond(bondObject) {
     if (selectedBond) {
-        selectedBond.material.color.set(0xffffff); // Reset color
-        selectedBond = null;
+        selectedBond.material.emissive.setHex(0x38bdf8);
+        selectedBond.material.emissiveIntensity = 0.2;
+    }
+    
+    selectedBond = bondObject;
+    if (selectedBond) {
+        selectedBond.material.emissive.setHex(0x00ff00);
+        selectedBond.material.emissiveIntensity = 0.5;
     }
 }
 
-function setupUI() {
-    const moleculeList = document.querySelector('.molecule-list');
-    Object.keys(molecules).forEach((key) => {
-        const item = document.createElement('button');
-        item.textContent = molecules[key].name;
-        item.addEventListener('click', () => loadMolecule(key));
-        moleculeList.appendChild(item);
-    });
-}
-
-function loadMolecule(name) {
-    if (currentMolecule) {
-        scene.clear();
+function handleKeyDown(event) {
+    if (event.key === 'Escape') {
+        camera.position.set(0, 0, 5);
+        controls.reset();
     }
-    const molecule = molecules[name];
-    currentMolecule = molecule;
-
-    molecule.atoms.forEach((atom, index) => {
-        const geometry = new THREE.SphereGeometry(atom.radius, 32, 32);
-        const material = new THREE.MeshPhongMaterial({ color: atom.color });
-        const mesh = new THREE.Mesh(geometry, material);
-
-        mesh.position.set(...atom.pos);
-        mesh.userData = { atomIndex: index };
-        scene.add(mesh);
-    });
-
-    molecule.bonds.forEach((bond) => {
-        const start = new THREE.Vector3(...molecule.atoms[bond.atoms[0]].pos);
-        const end = new THREE.Vector3(...molecule.atoms[bond.atoms[1]].pos);
-        createBond(start, end, bond.key);
-    });
-
-    camera.position.set(0, 0, 5);
-    controls.reset();
-    document.querySelector('.info-panel .title').textContent = molecule.name;
-    document.querySelector('.info-panel .description').textContent = molecule.description;
 }
 
 function animate() {
     requestAnimationFrame(animate);
-
+    
+    if (particleSystem) {
+        particleSystem.rotation.y += 0.0005;
+    }
+    
     controls.update();
     TWEEN.update();
-
-    particleSystem.rotation.y += 0.001;
+    
     bloomComposer.render();
 }
 
-// Start the application
+// Initialize the application
 init();
