@@ -203,71 +203,20 @@ function createBond(start, end, isKey) {
                 color: 0x38bdf8,
                 transparent: true,
                 opacity: 0.6,
-                emissive: 0x38bdf8,
-                emissiveIntensity: 0.5
+                                emissive: 0x38bdf8,
+                emissiveIntensity: 0.4
             });
-            
+
             const ring = new THREE.Mesh(ringGeometry, ringMaterial);
             ring.position.copy(bond.position);
-            ring.quaternion.copy(bond.quaternion);
             ring.rotation.x = Math.PI / 2;
-            
-            ring.userData.animation = {
-                offset: (i / 3) * Math.PI * 2,
-                speed: 1.5,
-                pulseSpeed: 2
-            };
-            
+            ring.position.y += (i - 1) * 0.15; // Space out the rings
             bondGroup.add(ring);
         }
     }
 
+    scene.add(bondGroup);
     return bondGroup;
-}
-
-function createMolecule(moleculeData) {
-    if (currentMolecule) {
-        scene.remove(currentMolecule);
-    }
-
-    currentMolecule = new THREE.Group();
-
-    // Create atoms
-    moleculeData.atoms.forEach((atom, index) => {
-        const geometry = new THREE.SphereGeometry(atom.radius, 32, 32);
-        const material = new THREE.MeshPhongMaterial({
-            color: atom.color,
-            specular: 0x444444,
-            shininess: 30
-        });
-        const sphere = new THREE.Mesh(geometry, material);
-        sphere.position.set(...atom.pos);
-        sphere.userData = { type: 'atom', index: index, element: atom.element };
-        currentMolecule.add(sphere);
-    });
-
-    // Create bonds
-    moleculeData.bonds.forEach((bond, index) => {
-        const start = new THREE.Vector3(...moleculeData.atoms[bond.atoms[0]].pos);
-        const end = new THREE.Vector3(...moleculeData.atoms[bond.atoms[1]].pos);
-        const bondGroup = createBond(start, end, bond.key);
-        bondGroup.userData = { type: 'bond', index: index, key: bond.key };
-        currentMolecule.add(bondGroup);
-    });
-
-    scene.add(currentMolecule);
-    updateMoleculeInfo(moleculeData);
-}
-
-function updateMoleculeInfo(moleculeData) {
-    const infoPanel = document.getElementById('molecule-info');
-    infoPanel.innerHTML = `
-        <h4>${moleculeData.name}</h4>
-        <p>${moleculeData.description}</p>
-        <p>Atoms: ${moleculeData.atoms.length}</p>
-        <p>Bonds: ${moleculeData.bonds.length}</p>
-        <p>Key bonds: ${moleculeData.bonds.filter(b => b.key).length}</p>
-    `;
 }
 
 function onWindowResize() {
@@ -280,322 +229,108 @@ function onWindowResize() {
 function onMouseMove(event) {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    if (currentMolecule) {
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObject(currentMolecule, true);
-        const bondIntersect = intersects.find(i => i.object.parent?.userData?.type === 'bond');
-
-        document.body.style.cursor = bondIntersect && bondIntersect.object.parent.userData.key ? 'pointer' : 'default';
-    }
 }
 
 function onMouseClick(event) {
-    if (!currentMolecule || isZoomedIn) return;
-
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObject(currentMolecule, true);
-    const bondIntersect = intersects.find(i => i.object.parent?.userData?.type === 'bond');
+    const intersects = raycaster.intersectObjects(scene.children);
 
-    if (bondIntersect && bondIntersect.object.parent.userData.key) {
-        zoomToBond(bondIntersect.object.parent);
+    if (intersects.length > 0) {
+        const object = intersects[0].object;
+        if (object.userData.atomIndex !== undefined) {
+            highlightAtom(object.userData.atomIndex);
+        } else if (object.userData.bondIndex !== undefined) {
+            selectBond(object.userData.bondIndex);
+        }
     }
 }
 
-function zoomToBond(bondGroup) {
-    isZoomedIn = true;
-    controls.enabled = false;
+function handleKeyDown(event) {
+    if (event.key === 'z') {
+        toggleZoom();
+    } else if (event.key === 'h') {
+        toggleHighlight();
+    }
+}
 
-    const bondPosition = new THREE.Vector3();
-    bondGroup.getWorldPosition(bondPosition);
+function toggleZoom() {
+    if (!isZoomedIn) {
+        const target = currentMolecule.center.clone();
+        const tween = new TWEEN.Tween(camera.position)
+            .to(
+                {
+                    x: target.x + 1.5,
+                    y: target.y + 1.5,
+                    z: target.z + 1.5
+                },
+                1000
+            )
+            .easing(TWEEN.Easing.Quadratic.Out)
+            .start();
+    } else {
+        const tween = new TWEEN.Tween(camera.position)
+            .to({ x: 0, y: 0, z: 5 }, 1000)
+            .easing(TWEEN.Easing.Quadratic.Out)
+            .start();
+    }
+    isZoomedIn = !isZoomedIn;
+}
 
-    const direction = camera.position.clone().sub(bondPosition).normalize();
-    const targetPosition = bondPosition.clone().add(direction.multiplyScalar(2));
-
-    new TWEEN.Tween(camera.position)
-        .to(targetPosition, 1000)
-        .easing(TWEEN.Easing.Cubic.InOut)
-        .start();
-
-    new TWEEN.Tween(currentMolecule.rotation)
-        .to({ y: currentMolecule.rotation.y + Math.PI * 2 }, 2000)
-        .easing(TWEEN.Easing.Cubic.InOut)
-        .start()
-        .onComplete(() => {
-            controls.enabled = true;
-            controls.target.copy(bondPosition);
-        });
+function toggleHighlight() {
+    if (selectedBond) {
+        selectedBond.material.color.set(0xffffff); // Reset color
+        selectedBond = null;
+    }
 }
 
 function setupUI() {
-    document.getElementById('molecule-select').addEventListener('change', (e) => {
-        const moleculeName = e.target.value;
-        if (moleculeName && molecules[moleculeName]) {
-            createMolecule(molecules[moleculeName]);
-        }
-    });
-
-    const helpButton = document.querySelector('.help-button');
-    const helpModal = document.querySelector('.help-modal');
-    
-    helpButton.addEventListener('click', () => {
-        helpModal.classList.toggle('active');
-    });
-
-    window.addEventListener('click', (e) => {
-        if (e.target === helpModal) {
-            helpModal.classList.remove('active');
-        }
+    const moleculeList = document.querySelector('.molecule-list');
+    Object.keys(molecules).forEach((key) => {
+        const item = document.createElement('button');
+        item.textContent = molecules[key].name;
+        item.addEventListener('click', () => loadMolecule(key));
+        moleculeList.appendChild(item);
     });
 }
 
-function handleKeyDown(e) {
-    if (e.key === 'Escape' && isZoomedIn) {
-        resetCamera();
-    }
-}
-
-function resetCamera() {
-    isZoomedIn = false;
-    controls.enabled = false;
-
-    new TWEEN.Tween(camera.position)
-        .to({ x: 0, y: 0, z: 5 }, 1500)
-        .easing(TWEEN.Easing.Cubic.InOut)
-        .start();
-
-    // Rotate molecule for better view
-    new TWEEN.Tween(currentMolecule.rotation)
-        .to({ y: currentMolecule.rotation.y + Math.PI * 2 }, 2000)
-        .easing(TWEEN.Easing.Cubic.InOut)
-        .start()
-        .onComplete(() => {
-            controls.enabled = true;
-            controls.target.copy(bondPosition);
-        });
-}
-
-function animate(time) {
-    requestAnimationFrame(animate);
-    TWEEN.update();
-
-    // Animate particles
-    if (particleSystem) {
-        particleSystem.rotation.y += 0.0001;
-        const positions = particleSystem.geometry.attributes.position.array;
-        for (let i = 0; i < positions.length; i += 3) {
-            positions[i + 1] += Math.sin(time * 0.001 + positions[i]) * 0.01;
-        }
-        particleSystem.geometry.attributes.position.needsUpdate = true;
-    }
-
-    // Animate molecule rotation
-    if (currentMolecule && !isZoomedIn) {
-        currentMolecule.rotation.y += 0.001;
-    }
-
-    // Animate bond rings
+function loadMolecule(name) {
     if (currentMolecule) {
-        currentMolecule.traverse((child) => {
-            if (child.userData.animation) {
-                const { offset, speed, pulseSpeed } = child.userData.animation;
-                child.rotation.z = time * 0.001 * speed + offset;
-                child.scale.setScalar(1 + Math.sin(time * 0.001 * pulseSpeed) * 0.1);
-                if (child.material) {
-                    child.material.opacity = 0.4 + Math.sin(time * 0.001 * pulseSpeed) * 0.2;
-                }
-            }
-        });
+        scene.clear();
     }
+    const molecule = molecules[name];
+    currentMolecule = molecule;
+
+    molecule.atoms.forEach((atom, index) => {
+        const geometry = new THREE.SphereGeometry(atom.radius, 32, 32);
+        const material = new THREE.MeshPhongMaterial({ color: atom.color });
+        const mesh = new THREE.Mesh(geometry, material);
+
+        mesh.position.set(...atom.pos);
+        mesh.userData = { atomIndex: index };
+        scene.add(mesh);
+    });
+
+    molecule.bonds.forEach((bond) => {
+        const start = new THREE.Vector3(...molecule.atoms[bond.atoms[0]].pos);
+        const end = new THREE.Vector3(...molecule.atoms[bond.atoms[1]].pos);
+        createBond(start, end, bond.key);
+    });
+
+    camera.position.set(0, 0, 5);
+    controls.reset();
+    document.querySelector('.info-panel .title').textContent = molecule.name;
+    document.querySelector('.info-panel .description').textContent = molecule.description;
+}
+
+function animate() {
+    requestAnimationFrame(animate);
 
     controls.update();
+    TWEEN.update();
+
+    particleSystem.rotation.y += 0.001;
     bloomComposer.render();
 }
 
-// The rest of your code remains the same...
-
-init();
-
-// Add background particles
-function createBackgroundParticles() {
-    const container = document.createElement('div');
-    container.className = 'background-particles';
-    document.body.appendChild(container);
-
-    for (let i = 0; i < 50; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.width = Math.random() * 4 + 'px';
-        particle.style.height = particle.style.width;
-        particle.style.left = Math.random() * 100 + 'vw';
-        particle.style.top = Math.random() * 100 + 'vh';
-        particle.style.setProperty('--translateX', `${Math.random() * 400 - 200}px`);
-        particle.style.setProperty('--translateY', `${Math.random() * 400 - 200}px`);
-        particle.style.animationDelay = `-${Math.random() * 20}s`;
-        container.appendChild(particle container.appendChild(particle));
-    }
-}
-
-function init() {
-    // Scene setup
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    renderer = new THREE.WebGLRenderer({ 
-        antialias: true,
-        alpha: true
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000, 0);
-    document.body.appendChild(renderer.domElement);
-
-    // Enhanced lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
-    scene.add(ambientLight);
-
-    // Add multiple point lights for dramatic effect
-    const lights = [
-        { color: 0x38bdf8, intensity: 2, pos: [10, 10, 10] },
-        { color: 0x0ea5e9, intensity: 1, pos: [-10, -10, -10] },
-        { color: 0x7dd3fc, intensity: 1.5, pos: [0, 15, 0] }
-    ];
-
-    lights.forEach(light => {
-        const pointLight = new THREE.PointLight(light.color, light.intensity);
-        pointLight.position.set(...light.pos);
-        scene.add(pointLight);
-    });
-
-    // Camera position
-    camera.position.z = 5;
-
-    // Enhanced controls
-    controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.rotateSpeed = 0.8;
-    controls.zoomSpeed = 1.2;
-
-    // Setup post-processing
-    setupBloomEffect();
-    
-    // Create particle system
-    createParticleSystem();
-    
-    // Create background particles
-    createBackgroundParticles();
-
-    // Raycaster setup
-    raycaster = new THREE.Raycaster();
-    mouse = new THREE.Vector2();
-
-    // Event listeners
-    window.addEventListener('resize', onWindowResize, false);
-    document.addEventListener('mousemove', onMouseMove, false);
-    document.addEventListener('click', onMouseClick, false);
-    document.addEventListener('keydown', handleKeyDown);
-
-    // UI setup with animations
-    setupUI();
-
-    // Start animation loop
-    animate();
-
-    // Fade in controls after loading
-    setTimeout(() => {
-        document.querySelector('.controls').classList.add('visible');
-        document.querySelector('.info-panel').classList.add('visible');
-        document.querySelector('.loading-screen').style.opacity = '0';
-        setTimeout(() => {
-            document.querySelector('.loading-screen').style.display = 'none';
-        }, 500);
-    }, 1000);
-}
-
-function handleKeyDown(e) {
-    if (e.key === 'Escape' && isZoomedIn) {
-        resetCamera();
-    }
-}
-
-function resetCamera() {
-    isZoomedIn = false;
-    controls.enabled = false;
-
-    // Reset camera with smooth animation
-    new TWEEN.Tween(camera.position)
-        .to({ x: 0, y: 0, z: 5 }, 1500)
-        .easing(TWEEN.Easing.Cubic.InOut)
-        .start();
-
-    // Reset controls target
-    new TWEEN.Tween(controls.target)
-        .to({ x: 0, y: 0, z: 0 }, 1500)
-        .easing(TWEEN.Easing.Cubic.InOut)
-        .start()
-        .onComplete(() => {
-            controls.enabled = true;
-        });
-}
-
-function setupUI() {
-    // Enhanced molecule selection handler
-    document.getElementById('molecule-select').addEventListener('change', (e) => {
-        const moleculeName = e.target.value;
-        if (moleculeName && molecules[moleculeName]) {
-            // Fade out current molecule
-            if (currentMolecule) {
-                new TWEEN.Tween(currentMolecule.material)
-                    .to({ opacity: 0 }, 500)
-                    .start()
-                    .onComplete(() => {
-                        scene.remove(currentMolecule);
-                        createMolecule(molecules[moleculeName]);
-                    });
-            } else {
-                createMolecule(molecules[moleculeName]);
-            }
-        }
-    });
-
-    // Enhanced help modal
-    const helpButton = document.querySelector('.help-button');
-    const helpModal = document.querySelector('.help-modal');
-    
-    helpButton.addEventListener('click', () => {
-        helpModal.classList.toggle('active');
-    });
-
-    helpModal.addEventListener('click', (e) => {
-        if (e.target === helpModal) {
-            helpModal.classList.remove('active');
-        }
-    });
-}
-
-function onMouseMove(event) {
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    // Highlight hovering effect
-    if (currentMolecule) {
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObject(currentMolecule, true);
-        const bondIntersect = intersects.find(i => i.object.parent?.userData?.type === 'bond');
-
-        document.body.style.cursor = bondIntersect && bondIntersect.object.parent.userData.key ? 'pointer' : 'default';
-
-        // Add hover effect to bonds
-        currentMolecule.traverse((child) => {
-            if (child.userData.type === 'bond' && child.material) {
-                if (bondIntersect && bondIntersect.object.parent === child) {
-                    child.material.emissiveIntensity = 0.5;
-                } else {
-                    child.material.emissiveIntensity = 0.2;
-                }
-            }
-        });
-    }
-}
-
-// Initialize the application
+// Start the application
 init();
