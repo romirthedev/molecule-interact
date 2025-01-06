@@ -19,9 +19,9 @@ const molecules = {
         name: 'Water (H₂O)',
         description: 'A molecule of water consists of two hydrogen atoms covalently bonded to a single oxygen atom.',
         atoms: [
-            { element: 'O', pos: [0, 0, 0], radius: 0.3, color: 0xff0000 },
-            { element: 'H', pos: [0.8, 0.6, 0], radius: 0.2, color: 0xffffff },
-            { element: 'H', pos: [-0.8, 0.6, 0], radius: 0.2, color: 0xffffff }
+            { element: 'O', pos: [0, 0, 0], radius: 0.3, color: 0xff4444 },  // Bright red for oxygen
+            { element: 'H', pos: [0.8, 0.6, 0], radius: 0.2, color: 0x00ffff },  // Cyan for hydrogen
+            { element: 'H', pos: [-0.8, 0.6, 0], radius: 0.2, color: 0x00ffff }  // Cyan for hydrogen
         ],
         bonds: [
             { atoms: [0, 1], key: true },
@@ -32,11 +32,11 @@ const molecules = {
         name: 'Methane (CH₄)',
         description: 'Methane is a tetrahedral molecule with four C-H bonds.',
         atoms: [
-            { element: 'C', pos: [0, 0, 0], radius: 0.3, color: 0x808080 },
-            { element: 'H', pos: [0.8, 0.8, 0.8], radius: 0.2, color: 0xffffff },
-            { element: 'H', pos: [-0.8, -0.8, 0.8], radius: 0.2, color: 0xffffff },
-            { element: 'H', pos: [0.8, -0.8, -0.8], radius: 0.2, color: 0xffffff },
-            { element: 'H', pos: [-0.8, 0.8, -0.8], radius: 0.2, color: 0xffffff }
+            { element: 'C', pos: [0, 0, 0], radius: 0.3, color: 0x00ff00 },  // Bright green for carbon
+            { element: 'H', pos: [0.8, 0.8, 0.8], radius: 0.2, color: 0xff00ff },  // Magenta for hydrogen
+            { element: 'H', pos: [-0.8, -0.8, 0.8], radius: 0.2, color: 0xff00ff },
+            { element: 'H', pos: [0.8, -0.8, -0.8], radius: 0.2, color: 0xff00ff },
+            { element: 'H', pos: [-0.8, 0.8, -0.8], radius: 0.2, color: 0xff00ff }
         ],
         bonds: [
             { atoms: [0, 1], key: true },
@@ -266,15 +266,14 @@ function createBond(start, end, isKey) {
     
     const bondGeometry = new THREE.CylinderGeometry(0.05, 0.05, length, 16);
     const bondMaterial = new THREE.MeshPhongMaterial({
-        color: 0xffffff,
-        emissive: 0x38bdf8,
-        emissiveIntensity: 0.2,
+        color: 0xffff00,  // Yellow for bonds
+        emissive: 0xff9500,  // Orange emissive
+        emissiveIntensity: 0.3,
         shininess: 100
     });
     
     const bond = new THREE.Mesh(bondGeometry, bondMaterial);
     
-    // Position the bond between the atoms
     bond.position.copy(start.clone().add(end).multiplyScalar(0.5));
     bond.quaternion.setFromUnitVectors(
         new THREE.Vector3(0, 1, 0),
@@ -284,16 +283,16 @@ function createBond(start, end, isKey) {
     bondGroup.add(bond);
 
     if (isKey) {
-        // Add decorative rings for key bonds
+        // Add decorative rings for key bonds with new colors
         const ringRadius = 0.15;
         for (let i = 0; i < 3; i++) {
             const ringGeometry = new THREE.TorusGeometry(ringRadius, 0.02, 16, 32);
             const ringMaterial = new THREE.MeshPhongMaterial({
-                color: 0x38bdf8,
+                color: 0xff9500,  // Orange for rings
                 transparent: true,
-                opacity: 0.6,
-                emissive: 0x38bdf8,
-                emissiveIntensity: 0.4
+                opacity: 0.8,
+                emissive: 0xff9500,
+                emissiveIntensity: 0.6
             });
 
             const ring = new THREE.Mesh(ringGeometry, ringMaterial);
@@ -306,6 +305,20 @@ function createBond(start, end, isKey) {
 
     scene.add(bondGroup);
     return bondGroup;
+}
+
+// Update the selectBond function for new highlight colors
+function selectBond(bondObject) {
+    if (selectedBond) {
+        selectedBond.material.emissive.setHex(0xff9500);  // Reset to orange
+        selectedBond.material.emissiveIntensity = 0.3;
+    }
+    
+    selectedBond = bondObject;
+    if (selectedBond) {
+        selectedBond.material.emissive.setHex(0x00ff00);  // Green highlight
+        selectedBond.material.emissiveIntensity = 0.8;
+    }
 }
 
 function onWindowResize() {
