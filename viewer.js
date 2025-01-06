@@ -203,7 +203,7 @@ function createBackgroundParticles() {
         particle.style.setProperty('--translateX', `${Math.random() * 400 - 200}px`);
         particle.style.setProperty('--translateY', `${Math.random() * 400 - 200}px`);
         particle.style.animationDelay = `-${Math.random() * 20}s`;
-        container.appendChild(particle container.appendChild(particle);
+        container.appendChild(particle container.appendChild(particle));
     }
 }
 
