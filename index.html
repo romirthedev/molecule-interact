@@ -1,74 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Nanobot Explorer</title>
-    <!-- External Stylesheets and Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nanobot Task Animation</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Header Section -->
-    <header class="hero">
-        <div class="hero-content">
-            <h1>Nanobot Explorer</h1>
-            <p>Visualizing Nanotechnology in Medicine</p>
-            <a href="#main-content" class="btn">Start Exploring</a>
-        </div>
-    </header>
+  <header>
+    <h1>Nanobot Tasks</h1>
+  </header>
 
-    <!-- Main Content Section -->
-    <section id="main-content">
-        <div class="simulation-container">
-            <div class="task" id="task1">
-                <h3>Targeting Cancer Cells</h3>
-                <p>Nanobots target and destroy cancerous cells.</p>
-                <button class="expand-btn">Learn More</button>
-            </div>
-            <div class="task" id="task2">
-                <h3>Delivering Drugs</h3>
-                <p>Nanobots carry drugs to the right location in the body.</p>
-                <button class="expand-btn">Learn More</button>
-            </div>
-            <div class="task" id="task3">
-                <h3>Repairing Tissues</h3>
-                <p>Nanobots assist in tissue repair at the cellular level.</p>
-                <button class="expand-btn">Learn More</button>
-            </div>
-        </div>
-
-        <!-- Timeline Section -->
-        <div class="timeline">
-            <h2>Timeline of Nanotechnology in Medicine</h2>
-            <div class="timeline-item" id="timeline1">
-                <h4>1990s: First Nanobots Designed</h4>
-                <p>Introduction to the concept of nanobots in medical applications.</p>
-            </div>
-            <div class="timeline-item" id="timeline2">
-                <h4>2000s: Drug Delivery Systems</h4>
-                <p>Nanobots used for targeted drug delivery.</p>
-            </div>
-            <div class="timeline-item" id="timeline3">
-                <h4>2010s: Tissue Repair</h4>
-                <p>Nanobots begin repairing tissues in experimental studies.</p>
-            </div>
-        </div>
+  <main class="task-container">
+    <section class="task" id="target-cancer">
+      <div class="task-content">
+        <div class="task-image" id="cancer-task-image"></div>
+        <h2>Targeting Cancer Cells</h2>
+        <button class="learn-more-button" data-target="cancer-modal">Learn More</button>
+      </div>
     </section>
 
-    <!-- Footer Section -->
-    <footer>
-        <div class="footer-links">
-            <a href="#">Learn More</a>
-            <a href="#">About Us</a>
-            <a href="#">Contact</a>
-        </div>
-    </footer>
+    <section class="task" id="drug-delivery">
+      <div class="task-content">
+        <div class="task-image" id="drug-delivery-image"></div>
+        <h2>Delivering Drugs</h2>
+        <button class="learn-more-button" data-target="drug-modal">Learn More</button>
+      </div>
+    </section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
-    <script src="script.js"></script>
+    <section class="task" id="repair-tissues">
+      <div class="task-content">
+        <div class="task-image" id="repair-task-image"></div>
+        <h2>Repairing Tissues</h2>
+        <button class="learn-more-button" data-target="repair-modal">Learn More</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modals -->
+  <div class="modal" id="cancer-modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2>More on Cancer Targeting</h2>
+      <p>Details on how nanobots target and bind to cancerous cells...</p>
+    </div>
+  </div>
+
+  <div class="modal" id="drug-modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2>Drug Delivery</h2>
+      <p>Details on how nanobots deliver drugs to targeted tissue...</p>
+    </div>
+  </div>
+
+  <div class="modal" id="repair-modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2>Repairing Damaged Tissue</h2>
+      <p>Details on how nanobots repair damaged tissues at the cellular level...</p>
+    </div>
+  </div>
+
+  <script src="js/gsap.min.js"></script>
+  <script src="js/anime.min.js"></script>
+  <script src="js/script.js"></script>
 </body>
 </html>
