@@ -300,77 +300,92 @@
                 left: -80px;
                 top: -30px;
             }
+
+            .hero-intro h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-intro {
+                padding: 1rem;
+            }
+
+            .hero-content {
+                padding: 1.5rem;
+            }
+
+            .timeline-item:nth-child(odd) .timeline-content,
+            .timeline-item:nth-child(even) .timeline-content {
+                width: 100%;
+                margin: 0;
+            }
+
+            .timeline-dot {
+                left: 10px;
+            }
+
+            .timeline-date {
+                font-size: 0.8rem;
+                left: -40px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Space Background -->
     <div class="space-background"></div>
-    <div class="stars" id="stars"></div>
-
-    <!-- Hero Section -->
+    <div class="stars">
+        <div class="star" style="--duration: 5s; --opacity: 0.5; --top: 20%; --left: 10%;"></div>
+        <div class="star" style="--duration: 7s; --opacity: 0.3; --top: 50%; --left: 30%;"></div>
+        <div class="star" style="--duration: 6s; --opacity: 0.7; --top: 30%; --left: 60%;"></div>
+        <!-- Add more stars as needed -->
+    </div>
+    <nav class="nav">
+        <a href="#about" style="color: var(--text); text-decoration: none;">About</a>
+        <a href="#experience" style="color: var(--text); text-decoration: none;">Experience</a>
+        <a href="#contact" style="color: var(--text); text-decoration: none;">Contact</a>
+    </nav>
     <section class="hero">
         <div class="hero-intro">
-            <h1>Hey! I am Romir</h1>
-            <p>A passionate developer crafting digital experiences with code and creativity</p>
+            <h1>Your Name</h1>
+            <p>Welcome to my portfolio. I am a software developer and web designer passionate about technology and innovation.</p>
+            <p class="typing-text">I specialize in full-stack web development, AI, and machine learning.</p>
         </div>
-
         <div class="hero-content">
             <div class="hero-image">
-                <img src="/api/placeholder/300/300" alt="Romir's Photo">
+                <img src="your-photo.jpg" alt="Your Name">
             </div>
             <div class="hero-text">
                 <h2>About Me</h2>
-                <div id="typing-container"></div>
+                <p>I am a developer with experience in building scalable web applications and working on cutting-edge research projects in AI.</p>
             </div>
         </div>
     </section>
-
-    <!-- Experience Timeline Section -->
-    <section class="experience">
-        <h2>My Journey</h2>
+    <section id="experience" class="experience">
         <div class="timeline">
             <div class="timeline-item">
                 <div class="timeline-content">
-                    <h3>Senior Developer</h3>
-                    <p>Company Name</p>
-                    <p>Led development of multiple high-impact projects and mentored junior developers.</p>
+                    <h3>Software Developer</h3>
+                    <p>Worked on various projects, focusing on full-stack development and machine learning.</p>
+                    <span class="timeline-date">Jan 2023 - Present</span>
                 </div>
                 <div class="timeline-dot"></div>
-                <div class="timeline-date">2020 - Present</div>
             </div>
-
             <div class="timeline-item">
                 <div class="timeline-content">
-                    <h3>Web Designer</h3>
-                    <p>Company Name</p>
-                    <p>Created responsive designs and improved user experience for major clients.</p>
+                    <h3>Intern at XYZ Corp</h3>
+                    <p>Contributed to building internal tools and applications for the company.</p>
+                    <span class="timeline-date">Jun 2022 - Aug 2022</span>
                 </div>
                 <div class="timeline-dot"></div>
-                <div class="timeline-date">2018 - 2020</div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h3>Junior Developer</h3>
-                    <p>Company Name</p>
-                    <p>Developed and maintained web applications using modern technologies.</p>
-                </div>
-                <div class="timeline-dot"></div>
-                <div class="timeline-date">2016 - 2018</div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h3>Intern</h3>
-                    <p>Company Name</p>
-                    <p>Learned fundamental web development practices and collaborated on team projects.</p>
-                </div>
-                <div class="timeline-dot"></div>
-                <div class="timeline-date">2015 - 2016</div>
             </div>
         </div>
     </section>
+    <section id="contact" class="contact">
+        <h2>Contact Me</h2>
+        <p>Feel free to reach out if you'd like to collaborate or just have a chat!</p>
+    </section>
+
 
     <script>
         // Create star background
