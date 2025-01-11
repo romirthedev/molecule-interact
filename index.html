@@ -1,53 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"> 
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Molecular Viewer</title>
-    <link rel="stylesheet" href="styles.css">
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
-            "@tweenjs/tween.js": "https://unpkg.com/@tweenjs/tween.js@21.0.0/dist/tween.esm.js"
-        }
-    }
-    </script>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Nanobot Explorer</title>
+    <!-- External Stylesheets and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="loading-screen">
-        <div class="loader"></div>
-        <p>Loading Molecular Viewer...</p>
-    </div>
-
-    <div class="controls">
-        <select id="molecule-select">
-            <option value="">Select a molecule</option>
-            <option value="water">Water (H₂O)</option>
-            <option value="methane">Methane (CH₄)</option>
-            <option value="ethanol">Ethanol (C₂H₅OH)</option>
-        </select>
-        <button class="help-button">?</button>
-    </div>
-
-    <div id="molecule-info" class="info-panel">
-        <h4>Select a molecule to begin</h4>
-    </div>
-
-    <div class="help-modal">
-        <div class="modal-content">
-            <h3>How to Use the Molecular Viewer</h3>
-            <ul>
-                <li>Select a molecule from the dropdown menu</li>
-                <li>Click and drag to rotate the view</li>
-                <li>Scroll to zoom in/out</li>
-                <li>Click on highlighted bonds (green rings) for detailed view</li>
-                <li>Press ESC to reset the view</li>
-            </ul>
+    <!-- Header Section -->
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Nanobot Explorer</h1>
+            <p>Visualizing Nanotechnology in Medicine</p>
+            <a href="#main-content" class="btn">Start Exploring</a>
         </div>
-    </div>
+    </header>
 
-    <script type="module" src="viewer.js"></script>
+    <!-- Main Content Section -->
+    <section id="main-content">
+        <div class="simulation-container">
+            <div class="task" id="task1">
+                <h3>Targeting Cancer Cells</h3>
+                <p>Nanobots target and destroy cancerous cells.</p>
+                <button class="expand-btn">Learn More</button>
+            </div>
+            <div class="task" id="task2">
+                <h3>Delivering Drugs</h3>
+                <p>Nanobots carry drugs to the right location in the body.</p>
+                <button class="expand-btn">Learn More</button>
+            </div>
+            <div class="task" id="task3">
+                <h3>Repairing Tissues</h3>
+                <p>Nanobots assist in tissue repair at the cellular level.</p>
+                <button class="expand-btn">Learn More</button>
+            </div>
+        </div>
+
+        <!-- Timeline Section -->
+        <div class="timeline">
+            <h2>Timeline of Nanotechnology in Medicine</h2>
+            <div class="timeline-item" id="timeline1">
+                <h4>1990s: First Nanobots Designed</h4>
+                <p>Introduction to the concept of nanobots in medical applications.</p>
+            </div>
+            <div class="timeline-item" id="timeline2">
+                <h4>2000s: Drug Delivery Systems</h4>
+                <p>Nanobots used for targeted drug delivery.</p>
+            </div>
+            <div class="timeline-item" id="timeline3">
+                <h4>2010s: Tissue Repair</h4>
+                <p>Nanobots begin repairing tissues in experimental studies.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="footer-links">
+            <a href="#">Learn More</a>
+            <a href="#">About Us</a>
+            <a href="#">Contact</a>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
