@@ -1,53 +1,76 @@
-// Hero Section Animations
-gsap.to(".hero h1", {
-    opacity: 1,
-    y: -50,
-    duration: 1,
-    delay: 0.5
-});
-gsap.to(".hero p", {
-    opacity: 1,
-    y: -50,
-    duration: 1,
-    delay: 1
-});
-gsap.to(".hero .btn", {
-    opacity: 1,
-    y: -50,
-    duration: 1,
-    delay: 1.5
-});
+// Initial Setup: Nanobot Task Animations
+document.addEventListener("DOMContentLoaded", () => {
+  // Define task image animation
+  const cancerImage = document.getElementById("cancer-task-image");
+  const drugImage = document.getElementById("drug-delivery-image");
+  const repairImage = document.getElementById("repair-task-image");
 
-// Task Animation (Nanobot Simulations)
-document.querySelectorAll('.task').forEach(task => {
-    task.addEventListener('mouseenter', () => {
-        gsap.to(task, {
-            scale: 1.1,
-            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3)',
-            duration: 0.3
-        });
+  // Nanobot Movement Animations (GSAP)
+  gsap.to(cancerImage, {
+    x: 200,
+    duration: 2,
+    repeat: -1,
+    yoyo: true
+  });
+
+  gsap.to(drugImage, {
+    x: 150,
+    duration: 3,
+    repeat: -1,
+    yoyo: true
+  });
+
+  gsap.to(repairImage, {
+    x: 180,
+    duration: 3.5,
+    repeat: -1,
+    yoyo: true
+  });
+
+  // Tooltip and Hover Effects (anime.js)
+  document.querySelectorAll('.task').forEach((task) => {
+    task.addEventListener('mouseenter', function() {
+      anime({
+        targets: task.querySelector('.task-image'),
+        scale: 1.1,
+        duration: 500,
+        easing: 'easeOutQuad'
+      });
+      task.querySelector('.task-content').style.animation = "zoomIn 1s ease-in-out";
     });
-    task.addEventListener('mouseleave', () => {
-        gsap.to(task, {
-            scale: 1,
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-            duration: 0.3
-        });
+    task.addEventListener('mouseleave', function() {
+      anime({
+        targets: task.querySelector('.task-image'),
+        scale: 1,
+        duration: 500,
+        easing: 'easeOutQuad'
+      });
     });
-});
+  });
 
-// Timeline Scroll Animations
-anime({
-    targets: '.timeline-item',
-    opacity: [0, 1],
-    translateY: [50, 0],
-    delay: anime.stagger(300),
-    duration: 1000,
-    easing: 'easeOutExpo'
-});
+  // Modal Open & Close Logic
+  const modalBtns = document.querySelectorAll(".learn-more-button");
+  modalBtns.forEach(button => {
+    button.addEventListener("click", function() {
+      const targetModalId = this.getAttribute("data-target");
+      const modal = document.getElementById(targetModalId);
+      modal.style.display = "block";
+    });
+  });
 
-// Smooth Scroll
-document.querySelector('.btn').addEventListener('click', (e) => {
-    e.preventDefault();
-    document.querySelector('#main-content').scrollIntoView({ behavior: 'smooth' });
+  // Close Modal when clicking X
+  const closeBtns = document.querySelectorAll(".close-btn");
+  closeBtns.forEach(btn => {
+    btn.addEventListener("click", function() {
+      this.closest(".modal").style.display = "none";
+    });
+  });
+
+  // Close Modal if clicked outside modal content
+  window.addEventListener("click", function(event) {
+    const modal = event.target.closest(".modal");
+    if (modal && !modal.contains(event.target)) {
+      modal.style.display = "none";
+    }
+  });
 });
