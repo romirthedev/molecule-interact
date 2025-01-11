@@ -1,76 +1,164 @@
-// Initial Setup: Nanobot Task Animations
-document.addEventListener("DOMContentLoaded", () => {
-  // Define task image animation
-  const cancerImage = document.getElementById("cancer-task-image");
-  const drugImage = document.getElementById("drug-delivery-image");
-  const repairImage = document.getElementById("repair-task-image");
+// Game setup
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-  // Nanobot Movement Animations (GSAP)
-  gsap.to(cancerImage, {
-    x: 200,
-    duration: 2,
-    repeat: -1,
-    yoyo: true
-  });
+canvas.width = 800;
+canvas.height = 600;
 
-  gsap.to(drugImage, {
-    x: 150,
-    duration: 3,
-    repeat: -1,
-    yoyo: true
-  });
+let score = 0;
+let gameOver = false;
+const shipWidth = 50;
+const shipHeight = 30;
+const bulletWidth = 5;
+const bulletHeight = 10;
+const invaderWidth = 40;
+const invaderHeight = 40;
 
-  gsap.to(repairImage, {
-    x: 180,
-    duration: 3.5,
-    repeat: -1,
-    yoyo: true
-  });
+let shipX = canvas.width / 2 - shipWidth / 2;
+let shipY = canvas.height - shipHeight - 10;
+let shipSpeed = 5;
 
-  // Tooltip and Hover Effects (anime.js)
-  document.querySelectorAll('.task').forEach((task) => {
-    task.addEventListener('mouseenter', function() {
-      anime({
-        targets: task.querySelector('.task-image'),
-        scale: 1.1,
-        duration: 500,
-        easing: 'easeOutQuad'
-      });
-      task.querySelector('.task-content').style.animation = "zoomIn 1s ease-in-out";
-    });
-    task.addEventListener('mouseleave', function() {
-      anime({
-        targets: task.querySelector('.task-image'),
-        scale: 1,
-        duration: 500,
-        easing: 'easeOutQuad'
-      });
-    });
-  });
+let bullets = [];
+let invaders = [];
+let invaderSpeed = 1;
 
-  // Modal Open & Close Logic
-  const modalBtns = document.querySelectorAll(".learn-more-button");
-  modalBtns.forEach(button => {
-    button.addEventListener("click", function() {
-      const targetModalId = this.getAttribute("data-target");
-      const modal = document.getElementById(targetModalId);
-      modal.style.display = "block";
-    });
-  });
-
-  // Close Modal when clicking X
-  const closeBtns = document.querySelectorAll(".close-btn");
-  closeBtns.forEach(btn => {
-    btn.addEventListener("click", function() {
-      this.closest(".modal").style.display = "none";
-    });
-  });
-
-  // Close Modal if clicked outside modal content
-  window.addEventListener("click", function(event) {
-    const modal = event.target.closest(".modal");
-    if (modal && !modal.contains(event.target)) {
-      modal.style.display = "none";
+// Create invaders
+for (let i = 0; i < 5; i++) {
+    for (let j = 0; j < 10; j++) {
+        invaders.push({
+            x: 70 + j * (invaderWidth + 10),
+            y: 30 + i * (invaderHeight + 10),
+            width: invaderWidth,
+            height: invaderHeight,
+            alive: true,
+        });
     }
-  });
+}
+
+// Draw the ship
+function drawShip() {
+    ctx.fillStyle = "white";
+    ctx.fillRect(shipX, shipY, shipWidth, shipHeight);
+}
+
+// Draw bullets
+function drawBullets() {
+    ctx.fillStyle = "yellow";
+    bullets.forEach(bullet => {
+        ctx.fillRect(bullet.x, bullet.y, bulletWidth, bulletHeight);
+    });
+}
+
+// Draw invaders
+function drawInvaders() {
+    invaders.forEach(invader => {
+        if (invader.alive) {
+            ctx.fillStyle = "green";
+            ctx.fillRect(invader.x, invader.y, invader.width, invader.height);
+        }
+    });
+}
+
+// Move the ship
+function moveShip() {
+    if (leftPressed && shipX > 0) {
+        shipX -= shipSpeed;
+    }
+    if (rightPressed && shipX + shipWidth < canvas.width) {
+        shipX += shipSpeed;
+    }
+}
+
+// Bullet movement
+function moveBullets() {
+    bullets.forEach(bullet => {
+        bullet.y -= 4;
+    });
+    // Remove bullets that go off screen
+    bullets = bullets.filter(bullet => bullet.y > 0);
+}
+
+// Check collision with invaders
+function checkCollision() {
+    bullets.forEach(bullet => {
+        invaders.forEach(invader => {
+            if (invader.alive && bullet.x < invader.x + invader.width && bullet.x + bulletWidth > invader.x &&
+                bullet.y < invader.y + invader.height && bullet.y + bulletHeight > invader.y) {
+                invader.alive = false;
+                bullet.y = -1;  // Remove the bullet after collision
+                score += 10;
+            }
+        });
+    });
+}
+
+// Draw score
+function drawScore() {
+    document.getElementById('score').textContent = `Score: ${score}`;
+}
+
+// Move invaders
+function moveInvaders() {
+    invaders.forEach(invader => {
+        if (invader.alive) {
+            invader.y += invaderSpeed;
+            if (invader.y + invaderHeight > canvas.height) {
+                gameOver = true;
+            }
+        }
+    });
+}
+
+// Draw the game over screen
+function drawGameOver() {
+    ctx.fillStyle = "red";
+    ctx.font = "30px Arial";
+    ctx.fillText("GAME OVER", canvas.width / 2 - 100, canvas.height / 2);
+}
+
+// Game loop
+function gameLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawShip();
+    drawBullets();
+    drawInvaders();
+    drawScore();
+
+    if (gameOver) {
+        drawGameOver();
+        return;
+    }
+
+    moveShip();
+    moveBullets();
+    moveInvaders();
+    checkCollision();
+
+    requestAnimationFrame(gameLoop);
+}
+
+// Control the ship
+let leftPressed = false;
+let rightPressed = false;
+document.addEventListener("keydown", event => {
+    if (event.key === "ArrowLeft") {
+        leftPressed = true;
+    }
+    if (event.key === "ArrowRight") {
+        rightPressed = true;
+    }
+    if (event.key === " ") {
+        bullets.push({ x: shipX + shipWidth / 2 - bulletWidth / 2, y: shipY });
+    }
 });
+document.addEventListener("keyup", event => {
+    if (event.key === "ArrowLeft") {
+        leftPressed = false;
+    }
+    if (event.key === "ArrowRight") {
+        rightPressed = false;
+    }
+});
+
+// Start the game
+gameLoop();
