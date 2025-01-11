@@ -31,6 +31,221 @@
             background: var(--darker);
             color: var(--text);
             overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Cursor Gradient */
+        .cursor-gradient {
+            position: fixed;
+            pointer-events: none;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, 
+                rgba(96, 165, 250, 0.15) 0%,
+                rgba(96, 165, 250, 0.1) 20%,
+                rgba(96, 165, 250, 0.05) 40%,
+                transparent 60%
+            );
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Space Background */
+        .space-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            z-index: -2;
+        }
+
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            opacity: var(--opacity);
+        }
+
+        /* Shooting Star */
+        .shooting-star {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(45deg, var(--primary), transparent);
+            transform: rotate(45deg);
+            pointer-events: none;
+            z-index: -1;
+            animation: shoot 1s linear forwards;
+        }
+
+        @keyframes shoot {
+            from {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            to {
+                transform: translateX(200%) translateY(200%) rotate(45deg);
+            }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: var(--opacity); }
+            50% { opacity: 0.2; }
+        }
+
+        /* Experience Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(2, 6, 23, 0.9);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 2rem;
+        }
+
+        .modal-content {
+            background: var(--dark);
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            border: 1px solid var(--primary);
+            animation: modalEnter 0.3s ease-out;
+        }
+
+        @keyframes modalEnter {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Timeline Animation */
+        .timeline::before {
+            animation: timelineGlow 4s linear infinite;
+        }
+
+        @keyframes timelineGlow {
+            0%, 100% {
+                background: linear-gradient(to bottom, 
+                    transparent,
+                    var(--primary),
+                    var(--highlight),
+                    var(--primary),
+                    transparent
+                );
+            }
+            50% {
+                background: linear-gradient(to bottom, 
+                    transparent,
+                    var(--highlight),
+                    var(--primary),
+                    var(--highlight),
+                    transparent
+                );
+            }
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 6rem 2rem;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .contact h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary);
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: rgba(96, 165, 250, 0.1);
+            border-radius: 0.5rem;
+            color: var(--text);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+
+        .contact-link:hover {
+            background: rgba(96, 165, 250, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .contact-link i {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+       :root {
+            --primary: #60a5fa;
+            --secondary: #3b82f6;
+            --accent: #2563eb;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #334155;
+            --text: #e2e8f0;
+            --highlight: #f472b6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--darker);
+            color: var(--text);
+            overflow-x: hidden;
         }
 
         /* Space Background */
@@ -301,11 +516,52 @@
                 top: -30px;
             }
         }
+
+        /* Responsive Design Updates */
+        @media (max-width: 768px) {
+            .cursor-gradient {
+                width: 200px;
+                height: 200px;
+            }
+
+            .contact-links {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .contact-link {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+
+            .modal-content {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Cursor Gradient -->
+    <div class="cursor-gradient"></div>
+
     <!-- Space Background -->
     <div class="space-background"></div>
+    <div class="stars" id="stars"></div>
+
+    <!-- Experience Modal -->
+    <div class="modal" id="experienceModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <h3 id="modalTitle"></h3>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Keep existing sections... -->
+    <!-- (Keep all the existing sections from the original code) -->
+<div class="space-background"></div>
     <div class="stars" id="stars"></div>
 
     <!-- Hero Section -->
@@ -372,9 +628,30 @@
         </div>
     </section>
 
+
+    <!-- Contact Section -->
+    <section class="contact">
+        <h2>Get in Touch</h2>
+        <div class="contact-links">
+            <a href="https://linkedin.com/in/yourprofile" class="contact-link">
+                <i class="fab fa-linkedin"></i>
+                LinkedIn
+            </a>
+            <a href="mailto:your.email@example.com" class="contact-link">
+                <i class="fas fa-envelope"></i>
+                Email
+            </a>
+            <a href="tel:+1234567890" class="contact-link">
+                <i class="fas fa-phone"></i>
+                Phone
+            </a>
+        </div>
+    </section>
+
     <script>
-        // Create star background
-        function createStars() {
+        // Existing functions remain...
+        // (Keep all the existing functions from the original code)
+function createStars() {
             const starsContainer = document.getElementById('stars');
             const starCount = 200;
 
@@ -433,6 +710,96 @@
             const y = e.clientY / window.innerHeight;
             
             stars.style.transform = `translate(${x * 20}px, ${y * 20}px)`;
+        });
+        // Cursor Gradient
+        function updateCursorGradient(e) {
+            const gradient = document.querySelector('.cursor-gradient');
+            gradient.style.left = `${e.clientX}px`;
+            gradient.style.top = `${e.clientY}px`;
+        }
+
+        // Shooting Stars
+        function createShootingStar() {
+            const star = document.createElement('div');
+            star.className = 'shooting-star';
+            
+            // Random starting position
+            const startX = Math.random() * window.innerWidth;
+            const startY = Math.random() * window.innerHeight;
+            
+            star.style.left = `${startX}px`;
+            star.style.top = `${startY}px`;
+            
+            document.body.appendChild(star);
+            
+            // Remove the star after animation
+            setTimeout(() => {
+                star.remove();
+            }, 1000);
+        }
+
+        // Experience Modal
+        function openModal(title, content) {
+            const modal = document.getElementById('experienceModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalTitle.textContent = title;
+            modalContent.innerHTML = content;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('experienceModal').style.display = 'none';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            typeText();
+
+            // Add click events to timeline items
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const title = item.querySelector('h3').textContent;
+                    const content = `
+                        <p class="modal-date">${item.querySelector('.timeline-date').textContent}</p>
+                        <p class="modal-company">${item.querySelector('p').textContent}</p>
+                        <div class="modal-description">
+                            <h4>Responsibilities:</h4>
+                            <ul>
+                                <li>Led development of multiple high-impact projects</li>
+                                <li>Mentored junior developers and conducted code reviews</li>
+                                <li>Implemented best practices and coding standards</li>
+                                <li>Collaborated with cross-functional teams</li>
+                            </ul>
+                            <h4>Achievements:</h4>
+                            <ul>
+                                <li>Improved application performance by 40%</li>
+                                <li>Reduced bug reports by 60%</li>
+                                <li>Successfully delivered 15+ major features</li>
+                            </ul>
+                        </div>
+                    `;
+                    openModal(title, content);
+                });
+            });
+
+            // Shooting stars interval
+            setInterval(createShootingStar, 3000);
+        });
+
+        // Event listeners
+        document.addEventListener('mousemove', updateCursorGradient);
+        window.addEventListener('resize', () => {
+            // Update any necessary responsive elements
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('experienceModal').addEventListener('click', (e) => {
+            if (e.target.id === 'experienceModal') {
+                closeModal();
+            }
         });
     </script>
 </body>
