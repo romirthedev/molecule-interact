@@ -9,6 +9,184 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
+:root {
+            --primary: #60a5fa;
+            --secondary: #3b82f6;
+            --accent: #2563eb;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #334155;
+            --text: #e2e8f0;
+            --highlight: #f472b6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--darker);
+            color: var(--text);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Glitch Effect for About Me */
+        .glitch {
+            position: relative;
+            text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
+                         0.025em 0.04em 0 #fffc00;
+            animation: glitch 725ms infinite;
+        }
+
+        .glitch span {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .glitch span:first-child {
+            animation: glitch 500ms infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+            transform: translate(-0.04em, -0.03em);
+            opacity: 0.75;
+        }
+
+        .glitch span:last-child {
+            animation: glitch 375ms infinite;
+            clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+            transform: translate(0.04em, 0.03em);
+            opacity: 0.75;
+        }
+
+        @keyframes glitch {
+            0% {
+                text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
+                             0.025em 0.04em 0 #fffc00;
+            }
+            15% {
+                text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
+                             0.025em 0.04em 0 #fffc00;
+            }
+            16% {
+                text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff,
+                             -0.05em -0.05em 0 #fffc00;
+            }
+            49% {
+                text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff,
+                             -0.05em -0.05em 0 #fffc00;
+            }
+            50% {
+                text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff,
+                             0 -0.04em 0 #fffc00;
+            }
+            99% {
+                text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff,
+                             0 -0.04em 0 #fffc00;
+            }
+            100% {
+                text-shadow: -0.05em 0 0 #00fffc, -0.025em -0.04em 0 #fc00ff,
+                             -0.04em -0.025em 0 #fffc00;
+            }
+        }
+
+        /* Experience Timeline RGB Animation */
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, #ff0000, #00ff00, #0000ff);
+            transform: translateX(-50%);
+            animation: rgbShift 5s linear infinite;
+            background-size: 100% 300%;
+        }
+
+        @keyframes rgbShift {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 0% 300%; }
+        }
+
+        /* Experience Box Hover Animation */
+        .timeline-content {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            transform: translateX(-100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .timeline-content:hover::before {
+            opacity: 1;
+            animation: slidingLine 2s linear infinite;
+        }
+
+        @keyframes slidingLine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Shooting Stars */
+        .shooting-star {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.1),
+                       0 0 0 8px rgba(255,255,255,0.1),
+                       0 0 20px rgba(255,255,255,1);
+            animation: shoot 3s linear infinite;
+        }
+
+        .shooting-star::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 300px;
+            height: 1px;
+            background: linear-gradient(90deg, white, transparent);
+        }
+
+        @keyframes shoot {
+            0% {
+                transform: rotate(315deg) translateX(0);
+                opacity: 1;
+            }
+            70% {
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(315deg) translateX(-1500px);
+                opacity: 0;
+            }
+        }
+
+        /* Experience Date Style */
+        .timeline-date-inner {
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+
         :root {
             --primary: #60a5fa;
             --secondary: #3b82f6;
@@ -40,7 +218,7 @@
             pointer-events: none;
             width: 400px;
             height: 400px;
-            background: radial-gradient(circle, 
+            background: radial-gradient(e, 
                 rgba(96, 165, 250, 0.15) 0%,
                 rgba(96, 165, 250, 0.1) 20%,
                 rgba(96, 165, 250, 0.05) 40%,
@@ -550,20 +728,6 @@
     <div class="space-background"></div>
     <div class="stars" id="stars"></div>
 
-    <!-- Experience Modal -->
-    <div class="modal" id="experienceModal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal()">&times;</button>
-            <h3 id="modalTitle"></h3>
-            <div id="modalContent"></div>
-        </div>
-    </div>
-
-    <!-- Keep existing sections... -->
-    <!-- (Keep all the existing sections from the original code) -->
-<div class="space-background"></div>
-    <div class="stars" id="stars"></div>
-
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-intro">
@@ -576,7 +740,11 @@
                 <img src="/api/placeholder/300/300" alt="Romir's Photo">
             </div>
             <div class="hero-text">
-                <h2>About Me</h2>
+                <h2 class="glitch">
+                    About Me
+                    <span aria-hidden="true">About Me</span>
+                    <span aria-hidden="true">About Me</span>
+                </h2>
                 <div id="typing-container"></div>
             </div>
         </div>
@@ -588,6 +756,7 @@
         <div class="timeline">
             <div class="timeline-item">
                 <div class="timeline-content">
+                    <div class="timeline-date-inner">2020 - Present</div>
                     <h3>Senior Developer</h3>
                     <p>Company Name</p>
                     <p>Led development of multiple high-impact projects and mentored junior developers.</p>
@@ -598,6 +767,7 @@
 
             <div class="timeline-item">
                 <div class="timeline-content">
+                    <div class="timeline-date-inner">2018 - 2020</div>
                     <h3>Web Designer</h3>
                     <p>Company Name</p>
                     <p>Created responsive designs and improved user experience for major clients.</p>
@@ -608,6 +778,7 @@
 
             <div class="timeline-item">
                 <div class="timeline-content">
+                    <div class="timeline-date-inner">2016 - 2018</div>
                     <h3>Junior Developer</h3>
                     <p>Company Name</p>
                     <p>Developed and maintained web applications using modern technologies.</p>
@@ -618,6 +789,7 @@
 
             <div class="timeline-item">
                 <div class="timeline-content">
+                    <div class="timeline-date-inner">2015 - 2016</div>
                     <h3>Intern</h3>
                     <p>Company Name</p>
                     <p>Learned fundamental web development practices and collaborated on team projects.</p>
@@ -627,7 +799,6 @@
             </div>
         </div>
     </section>
-
 
     <!-- Contact Section -->
     <section class="contact">
@@ -647,6 +818,7 @@
             </a>
         </div>
     </section>
+
 
     <script>
         // Existing functions remain...
@@ -794,7 +966,98 @@ function createStars() {
         window.addEventListener('resize', () => {
             // Update any necessary responsive elements
         });
+function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 200;
 
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                const duration = Math.random() * 3 + 2;
+                const opacity = Math.random() * 0.5 + 0.5;
+                star.style.setProperty('--duration', `${duration}s`);
+                star.style.setProperty('--opacity', opacity);
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Create shooting stars
+        function createShootingStar() {
+            const star = document.createElement('div');
+            star.className = 'shooting-star';
+            
+            // Random starting position
+            const startingY = Math.random() * window.innerHeight;
+            star.style.top = `${startingY}px`;
+            star.style.left = `${window.innerWidth}px`;
+            
+            document.body.appendChild(star);
+            
+            // Remove the star after animation
+            setTimeout(() => {
+                star.remove();
+            }, 3000);
+        }
+
+        // Typing animation
+        const aboutText = "I'm a passionate developer with a love for creating innovative solutions. With years of experience in web development, I specialize in building beautiful, responsive, and user-friendly applications. When I'm not coding, you can find me exploring new technologies and contributing to open-source projects.";
+        
+        function typeText() {
+            const container = document.getElementById('typing-container');
+            let index = 0;
+            const words = aboutText.split(' ');
+            
+            function addWord() {
+                if (index < words.length) {
+                    const span = document.createElement('span');
+                    span.className = 'typing-text';
+                    span.textContent = words[index] + ' ';
+                    container.appendChild(span);
+                    index++;
+                    setTimeout(addWord, 100);
+                }
+            }
+            
+            addWord();
+        }
+
+        // Cursor gradient effect
+        function updateCursorGradient(e) {
+            const gradient = document.querySelector('.cursor-gradient');
+            const x = e.clientX;
+            const y = e.clientY;
+            gradient.style.transform = `translate(${x}px, ${y}px)`;
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            typeText();
+
+            // Create shooting stars periodically
+            setInterval(createShootingStar, 2000);
+
+            // Add event listeners
+            document.addEventListener('mousemove', updateCursorGradient);
+        });
+
+        // Parallax effect for stars
+        document.addEventListener('mousemove', (e) => {
+            const stars = document.getElementById('stars');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            stars.style.transform = `translate(${x * 20}px, ${y * 20}px)`;
+        });
         // Close modal when clicking outside
         document.getElementById('experienceModal').addEventListener('click', (e) => {
             if (e.target.id === 'experienceModal') {
